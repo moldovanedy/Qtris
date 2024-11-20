@@ -1,0 +1,29 @@
+#ifndef MENU_BAR_H
+#define MENU_BAR_H
+
+#include <QMenuBar>
+
+class MenuBar : public QMenuBar
+{
+    Q_OBJECT
+
+public:
+    explicit MenuBar(QWidget *parent = nullptr);
+    ~MenuBar();
+
+    QAction *getGameNewAction();
+    QAction *getGameHighScoresAction();
+    QAction *getGameSettingsAction();
+    QAction *getGameQuitAction();
+
+    QAction *getHelpHowToPlayAction();
+    QAction *getHelpAboutAction();
+
+private:
+    QMenu *getGameMenu();
+    QMenu *getHelpMenu();
+
+    QString _currentFile;
+};
+
+#endif // MENU_BAR_H

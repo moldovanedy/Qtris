@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/include/qt6/6.8.0/gcc_64/include/QtWidgets",
+                "/home/Edy/Qt/6.8.0/gcc_64/include/QtWidgets",
+                "/home/Edy/Qt/6.8.0/gcc_64/include",
+                "/home/Edy/Qt/6.8.0/gcc_64/include/QtCore",
+                "/home/Edy/Qt/6.8.0/gcc_64/include/QtGui"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/g++",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "linux-gcc-x64"
+        }
+    ],
+    "version": 4
+}

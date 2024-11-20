@@ -1,0 +1,11 @@
+{
+    "cSpell.words": ["DCMAKE", "moldovanedy", "Qtris"],
+    "cmake.ignoreCMakeListsMissing": true,
+    "files.associations": {
+        "*.tss": "css",
+        "*.uxml": "xml",
+        "*.uss": "css",
+        "qmainwindow": "cpp",
+        "qsizepolicy": "cpp"
+    }
+}
