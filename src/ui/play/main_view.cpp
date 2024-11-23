@@ -1,10 +1,9 @@
 #include "main_view.h"
-#include "menu_bar.h"
 
-MainView::MainView(QWidget *parent) : QMainWindow(parent)
+UI::MainView::MainView(QWidget *parent) : QMainWindow(parent)
 {
-    this->setMinimumHeight(500);
-    this->setMinimumWidth(715);
+    this->setMinimumHeight(625);
+    this->setMinimumWidth(900);
 
     this->_menuBar = new MenuBar(parent);
     this->setMenuBar(this->_menuBar);
@@ -12,12 +11,12 @@ MainView::MainView(QWidget *parent) : QMainWindow(parent)
     this->showMaximized();
 }
 
-MainView::~MainView() {}
+UI::MainView::~MainView() {}
 
-QStackedWidget *MainView::getStackPanel()
+QStackedWidget *UI::MainView::getStackPanel()
 {
     this->mainStackPanel = new QStackedWidget();
-    this->mainStackPanel->setStyleSheet("background-image: url(:/images/assets/bg.png); background-repeat: repeat-xy;");
+    this->mainStackPanel->setStyleSheet("background-image: url(:/assets/bg.png); background-repeat: repeat-xy;");
 
     QWidget *verticalWrapper = new QWidget();
     verticalWrapper->setStyleSheet("background-image: url();");
@@ -39,11 +38,8 @@ QStackedWidget *MainView::getStackPanel()
             QWidget *leftSpacer = new QWidget();
             this->_horizontalContainer->addWidget(leftSpacer, 1);
 
-            this->_mainContent = new QWidget();
-            _mainContent->setStyleSheet("background-color: #00f; border: 2 solid #f00;");
-            _mainContent->setMinimumWidth(150);
-            _mainContent->setMinimumHeight(250);
-            this->_horizontalContainer->addWidget(_mainContent);
+            this->_mainContent = new UI::PlayArea();
+            this->_horizontalContainer->addWidget(this->_mainContent);
 
             QWidget *rightSpacer = new QWidget();
             this->_horizontalContainer->addWidget(rightSpacer, 1);
@@ -59,10 +55,10 @@ QStackedWidget *MainView::getStackPanel()
     return this->mainStackPanel;
 }
 
-void MainView::resizeEvent(QResizeEvent *e)
+void UI::MainView::resizeEvent(QResizeEvent *e)
 {
     QSize windowSize = e->size();
-    windowSize.setHeight(windowSize.height() - _menuBar->height());
+    windowSize.setHeight(windowSize.height() - this->_menuBar->height());
 
     float aspectRatio = windowSize.width() / (float)windowSize.height();
 

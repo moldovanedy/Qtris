@@ -1,13 +1,14 @@
 #include <iostream>
 #include <QApplication>
+#include <QFontDatabase>
 
-#include "ui/main_view.h"
+#include "ui/play/main_view.h"
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    MainView view;
+    UI::MainView view;
     view.show();
 
     return app.exec();
