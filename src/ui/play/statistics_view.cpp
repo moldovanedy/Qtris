@@ -21,30 +21,30 @@ UI::StatisticsView::StatisticsView(QWidget *parent) : QWidget(parent)
     mainColumn->addWidget(title);
 
     for (int i = 0; i < 7; i++) {
-        UI::Resources::PieceType pieceType;
+        DataManager::PieceData::PieceType pieceType;
         switch (i)
         {
         default:
         case 0:
-            pieceType = UI::Resources::PieceType::T;
+            pieceType = DataManager::PieceData::PieceType::T;
             break;
         case 1:
-            pieceType = UI::Resources::PieceType::J;
+            pieceType = DataManager::PieceData::PieceType::J;
             break;
         case 2:
-            pieceType = UI::Resources::PieceType::Z;
+            pieceType = DataManager::PieceData::PieceType::Z;
             break;
         case 3:
-            pieceType = UI::Resources::PieceType::O;
+            pieceType = DataManager::PieceData::PieceType::O;
             break;
         case 4:
-            pieceType = UI::Resources::PieceType::S;
+            pieceType = DataManager::PieceData::PieceType::S;
             break;
         case 5:
-            pieceType = UI::Resources::PieceType::L;
+            pieceType = DataManager::PieceData::PieceType::L;
             break;
         case 6:
-            pieceType = UI::Resources::PieceType::I;
+            pieceType = DataManager::PieceData::PieceType::I;
             break;
         }
 
@@ -54,7 +54,7 @@ UI::StatisticsView::StatisticsView(QWidget *parent) : QWidget(parent)
         QPoint spawnPoint = QPoint();
         QImage *piece = UI::Resources::getPieceImage(pieceType, -1, spawnPoint);
         QImage scaledPiece;
-        if (pieceType == UI::Resources::PieceType::I) {
+        if (pieceType == DataManager::PieceData::PieceType::I) {
             scaledPiece = piece->scaled(QSize(16, 16), Qt::AspectRatioMode::KeepAspectRatioByExpanding);
         }
         else {
@@ -84,6 +84,13 @@ UI::StatisticsView::StatisticsView(QWidget *parent) : QWidget(parent)
 
 UI::StatisticsView::~StatisticsView() {}
 
-void UI::StatisticsView::paintEvent(QPaintEvent *e)
-{
+void UI::StatisticsView::incrementPieceNumber(DataManager::PieceData::PieceType pieceType) {
+    int pieceNumber = getPieceNumber(pieceType);
+    pieceNumber++;
+    this->_labels->at(pieceType)->setText(QString(std::to_string(pieceNumber).c_str()));
+}
+
+int UI::StatisticsView::getPieceNumber(DataManager::PieceData::PieceType pieceType) {
+    QString previousString = this->_labels->at(pieceType)->text();
+    return std::stoi(previousString.toStdString());
 }

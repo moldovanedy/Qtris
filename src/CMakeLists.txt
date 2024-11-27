@@ -18,7 +18,16 @@ qt_add_executable(Qtris
     ui/play/render_area.cpp
     ui/play/next_piece_view.cpp
     ui/play/statistics_view.cpp
-    ui/play/piece_manager.cpp)
+    ui/play/piece_manager.cpp
+    
+    game_manager/play_field.cpp
+    game_manager/main_loop.cpp
+
+    data_manager/piece_data.cpp
+    data_manager/settings.cpp
+    data_manager/runtime_data.cpp
+
+    utils/event.h)
 
 qt_add_resources(
     Qtris "images" 

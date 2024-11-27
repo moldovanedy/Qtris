@@ -2,8 +2,7 @@
 
 QFont UI::PlayArea::_pixelFont;
 
-UI::PlayArea::PlayArea(QWidget *parent) : QWidget(parent)
-{
+UI::PlayArea::PlayArea(QWidget *parent) : QWidget(parent) {
     this->setMinimumWidth(150);
     this->setMinimumHeight(250);
     this->setContentsMargins(0, 0, 0, 0);
@@ -37,17 +36,13 @@ UI::PlayArea::PlayArea(QWidget *parent) : QWidget(parent)
 
 UI::PlayArea::~PlayArea() {}
 
-void UI::PlayArea::paintEvent(QPaintEvent *e)
-{
-}
+void UI::PlayArea::paintEvent(QPaintEvent *e) {}
 
-QFont UI::PlayArea::getDataPixelFont()
-{
+QFont UI::PlayArea::getDataPixelFont() {
     return PlayArea::_pixelFont;
 }
 
-void UI::PlayArea::setScore(int score)
-{
+void UI::PlayArea::setScore(int score) {
     std::string scoreString = std::to_string(score);
     if (scoreString.length() < 6)
     {
@@ -58,8 +53,7 @@ void UI::PlayArea::setScore(int score)
     this->_scoreLabel->setText(scoreString.c_str());
 }
 
-void UI::PlayArea::setLineCount(int lines)
-{
+void UI::PlayArea::setLineCount(int lines) {
     std::string linesString = std::to_string(lines);
     if (linesString.length() < 3)
     {
@@ -70,8 +64,7 @@ void UI::PlayArea::setLineCount(int lines)
     this->_linesLabel->setText(linesString.c_str());
 }
 
-void UI::PlayArea::setLevelNumber(int level)
-{
+void UI::PlayArea::setLevelNumber(int level) {
     std::string levelString = std::to_string(level);
     if (levelString.length() < 2)
     {
@@ -82,14 +75,13 @@ void UI::PlayArea::setLevelNumber(int level)
     this->_levelLabel->setText(levelString.c_str());
 }
 
-void UI::PlayArea::createLeftBar(QBoxLayout *column)
-{
+void UI::PlayArea::createLeftBar(QBoxLayout *column) {
     column->addSpacing(25);
 
     QLabel *gameModeLabel = new QLabel(this);
     gameModeLabel->setContentsMargins(0, 0, 0, 0);
     gameModeLabel->setFont(PlayArea::_pixelFont);
-    gameModeLabel->setText("NES MODE");
+    gameModeLabel->setText("A-TYPE");
     gameModeLabel->setAlignment(Qt::AlignCenter);
     gameModeLabel->setStyleSheet(QTRIS_DATA_AREA_STYLE);
     gameModeLabel->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Maximum);
@@ -100,8 +92,7 @@ void UI::PlayArea::createLeftBar(QBoxLayout *column)
     column->addWidget(new StatisticsView(this));
 }
 
-void UI::PlayArea::createRightBar(QBoxLayout *column)
-{
+void UI::PlayArea::createRightBar(QBoxLayout *column) {
     column->addSpacing(25);
 
     this->_scoreLabel = new QLabel(this);
@@ -144,6 +135,4 @@ void UI::PlayArea::createRightBar(QBoxLayout *column)
     column->addWidget(this->_levelLabel);
 }
 
-void UI::PlayArea::redraw()
-{
-}
+void UI::PlayArea::redraw() {}

@@ -52,6 +52,9 @@ QStackedWidget *UI::MainView::getStackPanel()
     }
 
     this->mainStackPanel->addWidget(verticalWrapper);
+
+    this->mainStackPanel->addWidget(GameManager::MainLoop::getInstance());
+
     return this->mainStackPanel;
 }
 

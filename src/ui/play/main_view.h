@@ -12,6 +12,7 @@
 
 #include "menu_bar.h"
 #include "play_area.h"
+#include "../../game_manager/main_loop.h"
 
 const QString QTRIS_DATA_AREA_STYLE = "background-color: #000; font-size: 22px; padding: 10px 20px; border: 2px solid #fff;";
 

@@ -62,276 +62,33 @@ static QImage **_cachedLArray = new QImage * [4];
 static QImage **_cachedIArray = new QImage * [4];
 
 static bool _isCacheValid = false;
-static int _defaultRotations[7]{ 2, 3, 0, 0, 0, 1, 1 };
 
-QImage *UI::Resources::getPieceImage(UI::Resources::PieceType pieceType, int rotation, QPoint &spawnPoint) {
+QImage *UI::Resources::getPieceImage(DataManager::PieceData::PieceType pieceType, int rotation, QPoint &spawnPoint) {
     if (!_isCacheValid) {
         recreateCachedImagesForPiece();
     }
 
+    if (rotation < 0) {
+        rotation = DataManager::PieceData::getDefaultRotationForPiece(pieceType);
+    }
+
     switch (pieceType) {
-    case PieceType::T:
-        if (rotation < 0) {
-            rotation = _defaultRotations[0];
-        }
+    case DataManager::PieceData::PieceType::T:
         return _cachedTArray[rotation];
-    case PieceType::J:
-        if (rotation < 0) {
-            rotation = _defaultRotations[1];
-        }
+    case DataManager::PieceData::PieceType::J:
         return _cachedJArray[rotation];
-    case PieceType::Z:
-        if (rotation < 0) {
-            rotation = _defaultRotations[2];
-        }
+    case DataManager::PieceData::PieceType::Z:
         return _cachedZArray[rotation];
-    case PieceType::O:
-        if (rotation < 0) {
-            rotation = _defaultRotations[3];
-        }
+    case DataManager::PieceData::PieceType::O:
         return _cachedOArray[rotation];
-    case PieceType::S:
-        if (rotation < 0) {
-            rotation = _defaultRotations[4];
-        }
+    case DataManager::PieceData::PieceType::S:
         return _cachedSArray[rotation];
-    case PieceType::L:
-        if (rotation < 0) {
-            rotation = _defaultRotations[5];
-        }
+    case DataManager::PieceData::PieceType::L:
         return _cachedLArray[rotation];
-    case PieceType::I:
-        if (rotation < 0) {
-            rotation = _defaultRotations[6];
-        }
+    case DataManager::PieceData::PieceType::I:
         return _cachedIArray[rotation];
     }
     return new QImage();
-}
-
-unsigned char *UI::Resources::getPieceLayout(UI::Resources::PieceType type, int rotation) {
-    if (rotation >= 0) {
-        rotation = rotation % 4;
-    }
-
-    switch (type)
-    {
-    default:
-    case PieceType::T:
-    {
-        switch (rotation)
-        {
-        case 0:
-            return new unsigned char[25] {
-                /**/0, 0, 0, 0, 0,
-                    0, 0, 1, 0, 0,
-                    0, 1, 1, 1, 0,
-                    0, 0, 0, 0, 0,
-                    0, 0, 0, 0, 0,
-                };
-        case 1:
-            return new unsigned char[25] {
-                /**/0, 0, 0, 0, 0,
-                    0, 0, 1, 0, 0,
-                    0, 0, 1, 1, 0,
-                    0, 0, 1, 0, 0,
-                    0, 0, 0, 0, 0,
-                };
-        default:
-        case 2:
-            return new unsigned char[25] {
-                /**/0, 0, 0, 0, 0,
-                    0, 0, 0, 0, 0,
-                    0, 1, 1, 1, 0,
-                    0, 0, 1, 0, 0,
-                    0, 0, 0, 0, 0,
-                };
-        case 3:
-            return new unsigned char[25] {
-                /**/0, 0, 0, 0, 0,
-                    0, 0, 1, 0, 0,
-                    0, 1, 1, 0, 0,
-                    0, 0, 1, 0, 0,
-                    0, 0, 0, 0, 0,
-                };
-        }
-
-        break;
-    }
-    case PieceType::J:
-    {
-        switch (rotation)
-        {
-        case 0:
-            return new unsigned char[25] {
-                /**/0, 0, 0, 0, 0,
-                    0, 0, 3, 0, 0,
-                    0, 0, 3, 0, 0,
-                    0, 3, 3, 0, 0,
-                    0, 0, 0, 0, 0,
-                };
-        case 1:
-            return new unsigned char[25] {
-                /**/0, 0, 0, 0, 0,
-                    0, 3, 0, 0, 0,
-                    0, 3, 3, 3, 0,
-                    0, 0, 0, 0, 0,
-                    0, 0, 0, 0, 0,
-                };
-        case 2:
-            return new unsigned char[25] {
-                /**/0, 0, 0, 0, 0,
-                    0, 0, 3, 3, 0,
-                    0, 0, 3, 0, 0,
-                    0, 0, 3, 0, 0,
-                    0, 0, 0, 0, 0,
-                };
-        default:
-        case 3:
-            return new unsigned char[25] {
-                /**/0, 0, 0, 0, 0,
-                    0, 0, 0, 0, 0,
-                    0, 3, 3, 3, 0,
-                    0, 0, 0, 3, 0,
-                    0, 0, 0, 0, 0,
-                };
-        }
-
-        break;
-    }
-    case PieceType::Z:
-    {
-        switch (rotation)
-        {
-        default:
-        case 0:
-        case 2:
-            return new unsigned char[25] {
-                /**/0, 0, 0, 0, 0,
-                    0, 0, 0, 0, 0,
-                    0, 2, 2, 0, 0,
-                    0, 0, 2, 2, 0,
-                    0, 0, 0, 0, 0,
-                };
-        case 1:
-        case 3:
-            return new unsigned char[25] {
-                /**/0, 0, 0, 0, 0,
-                    0, 0, 0, 2, 0,
-                    0, 0, 2, 2, 0,
-                    0, 0, 2, 0, 0,
-                    0, 0, 0, 0, 0,
-                };
-        }
-
-        break;
-    }
-    case PieceType::O:
-    {
-        return new unsigned char[25] {
-            /**/0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0,
-                0, 1, 1, 0, 0,
-                0, 1, 1, 0, 0,
-                0, 0, 0, 0, 0,
-            };
-    }
-    case PieceType::S:
-    {
-        switch (rotation)
-        {
-        default:
-        case 0:
-        case 2:
-            return new unsigned char[25] {
-                /**/0, 0, 0, 0, 0,
-                    0, 0, 0, 0, 0,
-                    0, 0, 3, 3, 0,
-                    0, 3, 3, 0, 0,
-                    0, 0, 0, 0, 0,
-                };
-        case 1:
-        case 3:
-            return new unsigned char[25] {
-                /**/0, 0, 0, 0, 0,
-                    0, 0, 3, 0, 0,
-                    0, 0, 3, 3, 0,
-                    0, 0, 0, 3, 0,
-                    0, 0, 0, 0, 0,
-                };
-        }
-
-        break;
-    }
-    case PieceType::L:
-    {
-        switch (rotation)
-        {
-        case 0:
-            return new unsigned char[25] {
-                /**/0, 0, 0, 0, 0,
-                    0, 0, 2, 0, 0,
-                    0, 0, 2, 0, 0,
-                    0, 0, 2, 2, 0,
-                    0, 0, 0, 0, 0,
-                };
-        default:
-        case 1:
-            return new unsigned char[25] {
-                /**/0, 0, 0, 0, 0,
-                    0, 0, 0, 0, 0,
-                    0, 2, 2, 2, 0,
-                    0, 2, 0, 0, 0,
-                    0, 0, 0, 0, 0,
-                };
-        case 2:
-            return new unsigned char[25] {
-                /**/0, 0, 0, 0, 0,
-                    0, 2, 2, 0, 0,
-                    0, 0, 2, 0, 0,
-                    0, 0, 2, 0, 0,
-                    0, 0, 0, 0, 0,
-                };
-        case 3:
-            return new unsigned char[25] {
-                /**/0, 0, 0, 0, 0,
-                    0, 0, 0, 2, 0,
-                    0, 2, 2, 2, 0,
-                    0, 0, 0, 0, 0,
-                    0, 0, 0, 0, 0,
-                };
-        }
-
-        break;
-    }
-    case PieceType::I:
-    {
-        switch (rotation)
-        {
-        case 0:
-        case 2:
-            return new unsigned char[25] {
-                /**/0, 0, 1, 0, 0,
-                    0, 0, 1, 0, 0,
-                    0, 0, 1, 0, 0,
-                    0, 0, 1, 0, 0,
-                    0, 0, 0, 0, 0,
-                };
-        default:
-        case 1:
-        case 3:
-            return new unsigned char[25] {
-                /**/0, 0, 0, 0, 0,
-                    0, 0, 0, 0, 0,
-                    1, 1, 1, 1, 0,
-                    0, 0, 0, 0, 0,
-                    0, 0, 0, 0, 0,
-                };
-        }
-
-        break;
-    }
-    }
 }
 
 unsigned char UI::Resources::getColorOneFromPallette() {
@@ -457,32 +214,12 @@ void UI::Resources::paintImage(QImage *image, int blockType) {
 
 static void UI::Resources::recreateCachedImagesForPiece() {
     for (int piece = 0; piece < 7; piece++) {
-        PieceType pieceType = (PieceType)piece;
+        DataManager::PieceData::PieceType pieceType = (DataManager::PieceData::PieceType)piece;
 
         for (int rot = 0; rot < 4; rot++) {
-            unsigned char *layout = UI::Resources::getPieceLayout(pieceType, rot);
-
-            //find the boundaries of the piece to determine the appropriate image size
+            unsigned char *layout = DataManager::PieceData::getPieceLayout(pieceType, rot);
             int startX = 4, startY = 4, endX = 0, endY = 0;
-            for (int row = 0; row < 5; row++) {
-                for (int column = 0; column < 5; column++) {
-                    if (layout[row * 5 + column] != 0) {
-                        if (column < startX) {
-                            startX = column;
-                        }
-                        if (column > endX) {
-                            endX = column;
-                        }
-
-                        if (row < startY) {
-                            startY = row;
-                        }
-                        if (row > endY) {
-                            endY = row;
-                        }
-                    }
-                }
-            }
+            DataManager::PieceData::getLayoutBounds(layout, startX, startY, endX, endY);
 
             assert((endX >= startX) && "endX smaller than startX");
             assert((endY >= startY) && "endY smaller than startY");
@@ -523,31 +260,31 @@ static void UI::Resources::recreateCachedImagesForPiece() {
             }
 
             switch (pieceType) {
-            case PieceType::T:
+            case DataManager::PieceData::PieceType::T:
                 delete _cachedTArray[rot];
                 _cachedTArray[rot] = finalImage;
                 break;
-            case PieceType::J:
+            case DataManager::PieceData::PieceType::J:
                 delete _cachedJArray[rot];
                 _cachedJArray[rot] = finalImage;
                 break;
-            case PieceType::Z:
+            case DataManager::PieceData::PieceType::Z:
                 delete _cachedZArray[rot];
                 _cachedZArray[rot] = finalImage;
                 break;
-            case PieceType::O:
+            case DataManager::PieceData::PieceType::O:
                 delete _cachedOArray[rot];
                 _cachedOArray[rot] = finalImage;
                 break;
-            case PieceType::S:
+            case DataManager::PieceData::PieceType::S:
                 delete _cachedSArray[rot];
                 _cachedSArray[rot] = finalImage;
                 break;
-            case PieceType::L:
+            case DataManager::PieceData::PieceType::L:
                 delete _cachedLArray[rot];
                 _cachedLArray[rot] = finalImage;
                 break;
-            case PieceType::I:
+            case DataManager::PieceData::PieceType::I:
                 delete _cachedIArray[rot];
                 _cachedIArray[rot] = finalImage;
                 break;

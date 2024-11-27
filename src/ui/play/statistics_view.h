@@ -6,6 +6,7 @@
 
 #include "play_area.h"
 #include "piece_manager.h"
+#include "../../data_manager/piece_data.h"
 
 namespace UI
 {
@@ -17,12 +18,12 @@ namespace UI
         explicit StatisticsView(QWidget *parent = nullptr);
         ~StatisticsView();
 
-    protected:
-        void paintEvent(QPaintEvent *) override;
+        void incrementPieceNumber(DataManager::PieceData::PieceType pieceType);
+        int getPieceNumber(DataManager::PieceData::PieceType pieceType);
 
     private:
-        std::map<UI::Resources::PieceType, QLabel *> *_labels =
-            new std::map<UI::Resources::PieceType, QLabel *>();
+        std::map<DataManager::PieceData::PieceType, QLabel *> *_labels =
+            new std::map<DataManager::PieceData::PieceType, QLabel *>();
         QString _currentFile;
     };
 }
