@@ -2,6 +2,7 @@
 #define PLAY_AREA_H
 
 #include <QWidget>
+#include <QKeyEvent>
 #include <QBoxLayout>
 #include <QLabel>
 #include <QSizePolicy>
@@ -13,6 +14,8 @@
 #include "render_area.h"
 #include "next_piece_view.h"
 #include "statistics_view.h"
+
+#include "../../game_manager/current_piece.h"
 
 namespace UI
 {
@@ -33,6 +36,8 @@ namespace UI
 
     protected:
         void paintEvent(QPaintEvent *) override;
+        void keyPressEvent(QKeyEvent *e) override;
+        void keyReleaseEvent(QKeyEvent *e) override;
 
     private:
         static QFont _pixelFont;

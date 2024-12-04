@@ -14,15 +14,18 @@ namespace GameManager {
         static PlayField *getInstance();
 
         bool isSquareFree(int row, int column);
+        int getSquareType(int row, int column);
+        void setSquareType(int row, int column, int squareType);
 
     private:
         PlayField();
         static PlayField *_instance;
 
         /**
-         * Represents the play field, each bit is a square. Goes from top-left to bottom-right (e.g. row 1, column 3 = 14 (index 2, bit 6))
+         * Represents the play field, each 2 bits is a square. Goes from top-left to bottom-right
+         * (e.g. row 1, column 3 = 26 and 27 (1 * 2 * 10 + 3 * 2)(index 3, bits 2 and 3))
          */
-        unsigned char _playField[25]{};
+        unsigned char _playField[50]{};
     };
 }
 

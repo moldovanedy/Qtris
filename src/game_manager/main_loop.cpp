@@ -17,12 +17,19 @@ GameManager::MainLoop *GameManager::MainLoop::getInstance() {
     return GameManager::MainLoop::_instance;
 }
 
-void GameManager::MainLoop::addUpdateListener(Utils::eventListener *callback) {
+void GameManager::MainLoop::addUpdateEventListener(std::function<void()> callback) {
     this->_updateEvent->addListener(callback);
 }
 
-bool GameManager::MainLoop::removeUpdateListener(Utils::eventListener *callback) {
+bool GameManager::MainLoop::removeUpdateEventListener(std::function<void()> callback) {
     return this->_updateEvent->removeListener(callback);
+}
+
+/**
+ * Returns a number that starts from 0 at the start of the application, indicating the frame number in this second (simulated time).
+ */
+int GameManager::MainLoop::getFrameCounter() {
+    return _frameCounter;
 }
 
 void GameManager::MainLoop::invokeEvent() {
@@ -33,7 +40,8 @@ void GameManager::MainLoop::invokeEvent() {
     else if (_fastFrames == 0) {
         this->_timer->setInterval(16);
     }
-    _fastFrames++;
 
+    _fastFrames++;
     this->_updateEvent->invoke();
+    _frameCounter++;
 }

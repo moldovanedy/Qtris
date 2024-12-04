@@ -12,6 +12,8 @@ UI::PlayArea::PlayArea(QWidget *parent) : QWidget(parent) {
     PlayArea::_pixelFont = QFont(fontFamily);
     this->setFont(PlayArea::_pixelFont);
 
+    this->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
+
     // debug only!
     //this->setAttribute(Qt::WA_StyledBackground, true);
     //this->setStyleSheet("background-color: #424242;");
@@ -37,6 +39,54 @@ UI::PlayArea::PlayArea(QWidget *parent) : QWidget(parent) {
 UI::PlayArea::~PlayArea() {}
 
 void UI::PlayArea::paintEvent(QPaintEvent *e) {}
+
+void UI::PlayArea::keyPressEvent(QKeyEvent *e) {
+    if (e->isAutoRepeat()) {
+        return;
+    }
+
+    switch (e->key()) {
+    case Qt::Key::Key_Left:
+        GameManager::CurrentPiece::getInstance()->setMoveLeftKeyState(true);
+        break;
+    case Qt::Key::Key_Right:
+        GameManager::CurrentPiece::getInstance()->setMoveRightKeyState(true);
+        break;
+    case Qt::Key::Key_Down:
+        GameManager::CurrentPiece::getInstance()->setSoftDropKeyState(true);
+        break;
+    case Qt::Key::Key_Z:
+        GameManager::CurrentPiece::getInstance()->setRotateCounterClockwiseKeyState(true);
+        break;
+    case Qt::Key::Key_X:
+        GameManager::CurrentPiece::getInstance()->setRotateClockwiseKeyState(true);
+        break;
+    }
+}
+
+void UI::PlayArea::keyReleaseEvent(QKeyEvent *e) {
+    if (e->isAutoRepeat()) {
+        return;
+    }
+
+    switch (e->key()) {
+    case Qt::Key::Key_Left:
+        GameManager::CurrentPiece::getInstance()->setMoveLeftKeyState(false);
+        break;
+    case Qt::Key::Key_Right:
+        GameManager::CurrentPiece::getInstance()->setMoveRightKeyState(false);
+        break;
+    case Qt::Key::Key_Down:
+        GameManager::CurrentPiece::getInstance()->setSoftDropKeyState(false);
+        break;
+    case Qt::Key::Key_Z:
+        GameManager::CurrentPiece::getInstance()->setRotateCounterClockwiseKeyState(false);
+        break;
+    case Qt::Key::Key_X:
+        GameManager::CurrentPiece::getInstance()->setRotateClockwiseKeyState(false);
+        break;
+    }
+}
 
 QFont UI::PlayArea::getDataPixelFont() {
     return PlayArea::_pixelFont;

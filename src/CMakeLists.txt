@@ -22,6 +22,8 @@ qt_add_executable(Qtris
     
     game_manager/play_field.cpp
     game_manager/main_loop.cpp
+    game_manager/current_piece.cpp
+    game_manager/core_runtime.cpp
 
     data_manager/piece_data.cpp
     data_manager/settings.cpp

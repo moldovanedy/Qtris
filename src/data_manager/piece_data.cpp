@@ -228,6 +228,11 @@ unsigned char *DataManager::PieceData::getPieceLayout(DataManager::PieceData::Pi
 }
 
 void DataManager::PieceData::getLayoutBounds(unsigned char *layout, int &startX, int &startY, int &endX, int &endY) {
+    startX = 4;
+    startY = 4;
+    endX = 0;
+    endY = 0;
+
     for (int row = 0; row < 5; row++) {
         for (int column = 0; column < 5; column++) {
             if (layout[row * 5 + column] != 0) {

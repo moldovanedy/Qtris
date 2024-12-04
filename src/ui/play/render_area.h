@@ -3,6 +3,11 @@
 
 #include <QWidget>
 #include <QPainter>
+#include <functional>
+
+#include "../../game_manager/play_field.h"
+#include "../../game_manager/main_loop.h"
+#include "piece_manager.h"
 
 namespace UI
 {
@@ -21,6 +26,9 @@ namespace UI
 
     private:
         QString _currentFile;
+        unsigned char *_lastExpandedLayout;
+
+        void paintBlocks(QPainter *painter, QRect renderArea);
     };
 }
 

@@ -2,20 +2,25 @@
 #define EVENT_H
 
 #include <vector>
+#include <functional>
 
 namespace Utils {
     typedef void(*eventListener(void));
 
     class Event {
     public:
-        void addListener(eventListener callback) {
+        void clearAllListeners() {
+            _callbacks.clear();
+        }
+
+        void addListener(std::function<void()> callback) {
             _callbacks.push_back(callback);
         }
 
-        bool removeListener(eventListener callback) {
+        bool removeListener(std::function<void()> callback) {
             bool result = false;
             for (int i = 0; i < _callbacks.size(); i++) {
-                if (_callbacks[i] == callback) {
+                if (_callbacks[i].target_type() == callback.target_type()) {
                     _callbacks.erase(_callbacks.begin() + i);
                     result = true;
                     break;
@@ -32,7 +37,7 @@ namespace Utils {
         }
 
     private:
-        std::vector<eventListener *> _callbacks;
+        std::vector<std::function<void()>> _callbacks;
     };
 }
 #endif

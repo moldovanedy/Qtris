@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QTimer>
+#include <functional>
 
 #include "../utils/event.h"
 
@@ -14,8 +15,9 @@ namespace GameManager {
         MainLoop(MainLoop &other) = delete;
         static MainLoop *getInstance();
 
-        void addUpdateListener(Utils::eventListener *callback);
-        bool removeUpdateListener(Utils::eventListener *callback);
+        void addUpdateEventListener(std::function<void()> callback);
+        bool removeUpdateEventListener(std::function<void()> callback);
+        int getFrameCounter();
 
     private:
         MainLoop(QWidget *parent = nullptr);
@@ -23,6 +25,7 @@ namespace GameManager {
 
         Utils::Event *_updateEvent;
         QTimer *_timer;
+        int _frameCounter = 0;
         int _fastFrames = 0;
         void invokeEvent();
     };
