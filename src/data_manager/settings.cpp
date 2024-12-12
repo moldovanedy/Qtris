@@ -11,7 +11,7 @@ static std::map<SettingType, int> _settingsDataTypes
 {
     {SettingType::Audio_MainVolume, 0},
     {SettingType::Audio_SfxVolume, 0},
-    {SettingType::Audio_CustomSoundtrack, 3},
+    {SettingType::Audio_CustomSoundtrackPath, 3},
 };
 
 int DataManager::Settings::getIntSetting(SettingType settingType) {

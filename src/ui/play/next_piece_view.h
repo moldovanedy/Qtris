@@ -16,11 +16,13 @@ namespace UI
         explicit NextPieceView(QWidget *parent = nullptr);
         ~NextPieceView();
 
-    protected:
-        void paintEvent(QPaintEvent *) override;
-
     private:
+        void onPieceLocked();
+        void onUpdate();
+        int _framesUntilRepaint = 0;
+
         QString _currentFile;
+        QLabel *_pieceView;
     };
 }
 #endif // NEXT_PIECE_VIEW_H

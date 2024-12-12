@@ -1,14 +1,20 @@
 #ifndef RUNTIME_DATA_H
 #define RUNTIME_DATA_H
 
+#include <functional>
+
+#include "../utils/event.h"
+
 namespace DataManager::RuntimeData {
     unsigned int getLevel();
-    void setLevel(unsigned int level);
-
     unsigned int getScore();
-    void setScore(unsigned int score);
-
     unsigned int getClearedLines();
-    void setClearedLines(unsigned int lines);
+    unsigned int getGravitySpeed();
+
+    void addClearedLines(unsigned int lines);
+    void addSoftDropScore(unsigned int score);
+
+    void addDataChangedCallback(std::function<void()> callback);
+    void removeDataChangedCallback(std::function<void()> callback);
 }
 #endif

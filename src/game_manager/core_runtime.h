@@ -1,5 +1,7 @@
 #include "main_loop.h"
 #include "play_field.h"
+#include "current_piece.h"
+#include "../ui/play/piece_manager.h"
 
 namespace GameManager {
     class CoreRuntime {
@@ -12,7 +14,11 @@ namespace GameManager {
         CoreRuntime();
         static CoreRuntime *_instance;
 
-        std::function<void()> _updateCallback;
         void onUpdate();
+        void checkForLineClears();
+
+        bool _isInLineClearAnimation = false;
+        int _lineClearAnimationStepsLeft = 0;
+        int _rowsToClear[4]{ 0 };
     };
 }

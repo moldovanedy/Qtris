@@ -33,6 +33,10 @@ int GameManager::MainLoop::getFrameCounter() {
 }
 
 void GameManager::MainLoop::invokeEvent() {
+    if (_isPaused) {
+        return;
+    }
+
     if (_fastFrames >= 3) {
         _fastFrames = 0;
         this->_timer->setInterval(17);

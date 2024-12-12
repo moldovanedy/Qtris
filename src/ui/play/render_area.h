@@ -7,6 +7,7 @@
 
 #include "../../game_manager/play_field.h"
 #include "../../game_manager/main_loop.h"
+#include "../../data_manager/runtime_data.h"
 #include "piece_manager.h"
 
 namespace UI
@@ -20,6 +21,7 @@ namespace UI
         ~RenderArea();
 
         void redraw();
+        void checkForPieceColorChange();
 
     protected:
         void paintEvent(QPaintEvent *) override;

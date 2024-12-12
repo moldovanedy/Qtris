@@ -16,6 +16,19 @@ static int _nesPallette[64]{
         0xfcfcfc, 0xa4e4fc, 0xb8b8f8, 0xd8b8f8, 0xf8b8f8, 0xf8a4c0, 0xf0d0b0, 0xfce0a8,
         0xf8d878, 0xd8f878, 0xb8f8b8, 0xb8f8d8, 0x00fcfc, 0xf8d8f8, 0x000000, 0x000000 };
 
+static unsigned char _knownColors[30]{
+    /**/0x30, 0x21, 0x12,
+    0x30, 0x29, 0x1A,
+    0x30, 0x24, 0x14,
+    0x30, 0x2A, 0x12,
+    0x30, 0x2B, 0x15,
+    0x30, 0x22, 0x2B,
+    0x30, 0x00, 0x16,
+    0x30, 0x05, 0x13,
+    0x30, 0x16, 0x12,
+    0x30, 0x27, 0x16
+};
+
 static unsigned char _blockOneData[64]{
     /**/1, 3, 3, 3, 3, 3, 3, 0,
         3, 1, 1, 1, 1, 1, 3, 0,
@@ -107,44 +120,62 @@ unsigned char UI::Resources::getColorFourFromPallette() {
     return _currentPalette;
 }
 
-void UI::Resources::setColorOneFromPallette(unsigned char palletteValue) {
+static void setColorOneFromPallette(unsigned char palletteValue) {
     if (palletteValue >= 0x40) {
         throw std::invalid_argument("Invalid pallette index at UI::Resources::setColorOneFromPallette");
     }
 
-    _currentPalette &= ((int)palletteValue << 24) | 0x00ffffff;
+    _currentPalette = (_currentPalette & 0x00ffffff) | ((int)palletteValue << 24);
     _isCacheValid = false;
 }
 
-void UI::Resources::setColorTwoFromPallette(unsigned char palletteValue) {
+static void setColorTwoFromPallette(unsigned char palletteValue) {
     if (palletteValue >= 0x40) {
         throw std::invalid_argument("Invalid pallette index at UI::Resources::setColorTwoFromPallette");
     }
 
-    _currentPalette &= ((int)palletteValue << 16) | 0xff00ffff;
+    _currentPalette = (_currentPalette & 0xff00ffff) | ((int)palletteValue << 16);
     _isCacheValid = false;
 }
 
-void UI::Resources::setColorThreeFromPallette(unsigned char palletteValue) {
+static void setColorThreeFromPallette(unsigned char palletteValue) {
     if (palletteValue >= 0x40) {
         throw std::invalid_argument("Invalid pallette index at UI::Resources::setColorThreeFromPallette");
     }
 
-    _currentPalette &= ((int)palletteValue << 8) | 0xffff00ff;
+    _currentPalette = (_currentPalette & 0xffff00ff) | ((int)palletteValue << 8);
     _isCacheValid = false;
 }
 
-void UI::Resources::setColorFourFromPallette(unsigned char palletteValue) {
+static void setColorFourFromPallette(unsigned char palletteValue) {
     if (palletteValue >= 0x40) {
         throw std::invalid_argument("Invalid pallette index at UI::Resources::setColorFourFromPallette");
     }
 
-    _currentPalette &= (int)palletteValue | 0xffffff00;
+    _currentPalette = (_currentPalette & 0xffffff00) | (int)palletteValue;
     _isCacheValid = false;
 }
 
+unsigned int _lastLevel = 0;
+
+void UI::Resources::setColorsForLevel(unsigned int level) {
+    //TODO: also implement glitched colors
+    if (_lastLevel == level) {
+        return;
+    }
+    level = level % 10;
+    _lastLevel = level;
+    //qDebug() << level;
+
+    setColorTwoFromPallette(_knownColors[level * 3]);
+    setColorThreeFromPallette(_knownColors[level * 3 + 1]);
+    setColorFourFromPallette(_knownColors[level * 3 + 2]);
+}
+
+
 QImage *UI::Resources::getTypeOneBlock() {
-    if (!_isCacheValid) {
+    if (!_isCacheValid)
+    {
         _cachedBlockTypeOne = new QImage(QSize(8, 8), QImage::Format_RGB888);
         paintImage(_cachedBlockTypeOne, 1);
     }

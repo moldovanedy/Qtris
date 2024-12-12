@@ -26,15 +26,21 @@ namespace UI
         explicit MainView(QWidget *parent = nullptr);
         ~MainView();
 
+        static MainView *getInstance();
+
         QStackedWidget *getStackPanel();
+        void setPauseScreenVisibility(bool shouldMakeVisible);
 
     protected:
         void resizeEvent(QResizeEvent *) override;
 
     private:
+        static MainView *_instance;
+
         MenuBar *_menuBar;
         // PlayArea *_mainContent;
         QWidget *_mainContent;
+        QLabel *_pauseScreen;
 
         QStackedWidget *mainStackPanel;
         QBoxLayout *_verticalContainer;

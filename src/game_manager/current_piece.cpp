@@ -33,12 +33,17 @@ void GameManager::CurrentPiece::onUpdate() {
         this->_areRemainingFrames--;
         return;
     }
+    if (this->_lineClearRemainingFrames > 0) {
+        this->_lineClearRemainingFrames--;
+        return;
+    }
 
     if (this->_isAreActive) {
         this->reset();
-        _isAreActive = false;
+        this->_isAreActive = false;
         //prevent further soft drop
         this->_softDropFrame = -1;
+        return;
     }
 
     if (this->_isMoveLeftKeyDown || this->_isMoveRightKeyDown) {
@@ -62,7 +67,7 @@ void GameManager::CurrentPiece::onUpdate() {
             this->_softDropFrame = 1;
             return;
         }
-        else {
+        else if (this->_softDropFrame != -1) {
             this->_softDropFrame--;
             return;
         }
@@ -71,10 +76,16 @@ void GameManager::CurrentPiece::onUpdate() {
     //we DO need to use a separate fall frame counter to correctly implement ARE
     this->_fallFrame++;
 
-    //TODO: get the frames for drop corresponding to each level
-    if (this->_fallFrame % 15 == 0) {
+    if (this->_fallFrame % DataManager::RuntimeData::getGravitySpeed() == 0) {
         this->performFall();
     }
+}
+
+void GameManager::CurrentPiece::setLineClearDelay(int frameDelay) {
+    this->_isAreActive = false;
+    this->_areRemainingFrames = 0;
+
+    this->_lineClearRemainingFrames = frameDelay;
 }
 
 void GameManager::CurrentPiece::getCurrentPieceData(PieceType &pieceType, int &rotation) {
@@ -90,6 +101,7 @@ void GameManager::CurrentPiece::getNextPieceData(PieceType &pieceType, int &rota
 bool GameManager::CurrentPiece::reset() {
     if (this->_isFirstPiece) {
         this->_nextPieceType = this->generateNextPiece();
+        this->_pieceLockedEvent->invoke();
         this->_nextPieceRotation = DataManager::PieceData::getDefaultRotationForPiece(this->_nextPieceType);
         this->_isFirstPiece = false;
 
@@ -175,14 +187,10 @@ bool GameManager::CurrentPiece::rotateClockwise() {
     return true;
 }
 
-void GameManager::CurrentPiece::performSoftDrop() {
-
-}
-
 void GameManager::CurrentPiece::performFall() {
     if (!this->canMoveDown()) {
-        this->_pieceLockedEvent->invoke();
         this->passControlToAre();
+        this->_pieceLockedEvent->invoke();
         return;
     }
 
@@ -233,11 +241,11 @@ void GameManager::CurrentPiece::passControlToAre() {
     this->_isAreActive = true;
 }
 
-void GameManager::CurrentPiece::addPieceLockedEventHandler(Utils::eventListener *callback) {
+void GameManager::CurrentPiece::addPieceLockedEventHandler(std::function<void()> callback) {
     this->_pieceLockedEvent->addListener(callback);
 }
 
-bool GameManager::CurrentPiece::removePieceLockedEventHandler(Utils::eventListener *callback) {
+bool GameManager::CurrentPiece::removePieceLockedEventHandler(std::function<void()> callback) {
     return this->_pieceLockedEvent->removeListener(callback);
 }
 

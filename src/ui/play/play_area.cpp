@@ -34,14 +34,27 @@ UI::PlayArea::PlayArea(QWidget *parent) : QWidget(parent) {
     rightBarBox->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     horizontalBox->addLayout(rightBarBox, 1);
     this->createRightBar(rightBarBox);
+
+    DataManager::RuntimeData::addDataChangedCallback(std::bind(&UI::PlayArea::onDataChanged, this));
 }
 
 UI::PlayArea::~PlayArea() {}
 
-void UI::PlayArea::paintEvent(QPaintEvent *e) {}
+void UI::PlayArea::onDataChanged() {
+    this->setLevelNumber(DataManager::RuntimeData::getLevel());
+    this->setScore(DataManager::RuntimeData::getScore());
+    this->setLineCount(DataManager::RuntimeData::getClearedLines());
+}
+
 
 void UI::PlayArea::keyPressEvent(QKeyEvent *e) {
     if (e->isAutoRepeat()) {
+        return;
+    }
+
+    if (e->key() == Qt::Key::Key_Escape) {
+        GameManager::MainLoop::getInstance()->togglePause();
+        UI::MainView::getInstance()->setPauseScreenVisibility(GameManager::MainLoop::getInstance()->isPaused());
         return;
     }
 

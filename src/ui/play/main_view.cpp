@@ -1,7 +1,13 @@
 #include "main_view.h"
 
+UI::MainView *UI::MainView::_instance = nullptr;
+
 UI::MainView::MainView(QWidget *parent) : QMainWindow(parent)
 {
+    if (UI::MainView::_instance == nullptr) {
+        UI::MainView::_instance = this;
+    }
+
     this->setMinimumHeight(625);
     this->setMinimumWidth(900);
 
@@ -12,6 +18,15 @@ UI::MainView::MainView(QWidget *parent) : QMainWindow(parent)
 }
 
 UI::MainView::~MainView() {}
+
+UI::MainView *UI::MainView::getInstance()
+{
+    if (UI::MainView::_instance == nullptr) {
+        UI::MainView::_instance = new MainView();
+    }
+
+    return UI::MainView::_instance;
+}
 
 QStackedWidget *UI::MainView::getStackPanel()
 {
@@ -50,12 +65,22 @@ QStackedWidget *UI::MainView::getStackPanel()
         QWidget *bottomSpacer = new QWidget();
         this->_verticalContainer->addWidget(bottomSpacer, 1);
     }
-
     this->mainStackPanel->addWidget(verticalWrapper);
 
     this->mainStackPanel->addWidget(GameManager::MainLoop::getInstance());
 
+    this->_pauseScreen = new QLabel("PAUSED", this->mainStackPanel);
+    this->_pauseScreen->setFont(PlayArea::getDataPixelFont());
+    this->_pauseScreen->setAlignment(Qt::AlignCenter);
+    this->_pauseScreen->setStyleSheet("font-size: 45px; background-color: #000; background-image: url();");
+    this->_pauseScreen->setVisible(false);
+
     return this->mainStackPanel;
+}
+
+void UI::MainView::setPauseScreenVisibility(bool shouldMakeVisible)
+{
+    this->_pauseScreen->setVisible(shouldMakeVisible);
 }
 
 void UI::MainView::resizeEvent(QResizeEvent *e)
@@ -64,6 +89,7 @@ void UI::MainView::resizeEvent(QResizeEvent *e)
     windowSize.setHeight(windowSize.height() - this->_menuBar->height());
 
     float aspectRatio = windowSize.width() / (float)windowSize.height();
+    this->_pauseScreen->setFixedSize(windowSize.width(), windowSize.height());
 
     // height matters
     if (aspectRatio > 1.5)
@@ -77,6 +103,4 @@ void UI::MainView::resizeEvent(QResizeEvent *e)
         int width = windowSize.width();
         this->_mainContent->setFixedSize(width, width * 0.66666667);
     }
-
-    // this->mainContent->setFixedSize(300, 400);
 }

@@ -6,6 +6,7 @@ UI::RenderArea::RenderArea(QWidget *parent) : QWidget(parent)
     this->setContentsMargins(0, 0, 0, 0);
 
     GameManager::MainLoop::getInstance()->addUpdateEventListener(std::bind(&UI::RenderArea::redraw, this));
+    DataManager::RuntimeData::addDataChangedCallback(std::bind(&UI::RenderArea::checkForPieceColorChange, this));
 }
 
 UI::RenderArea::~RenderArea() {
@@ -15,6 +16,11 @@ UI::RenderArea::~RenderArea() {
 void UI::RenderArea::redraw()
 {
     this->update();
+}
+
+void UI::RenderArea::checkForPieceColorChange() {
+    //set the colors (will check if the level has changed or not)
+    UI::Resources::setColorsForLevel(DataManager::RuntimeData::getLevel());
 }
 
 void UI::RenderArea::paintEvent(QPaintEvent *e)
@@ -56,6 +62,7 @@ void UI::RenderArea::paintBlocks(QPainter *painter, QRect renderArea) {
                 imageToDraw = QImage();
                 break;
             case 1:
+                //TODO: we need to check if we need to regenerate the images somehow here
                 if (typeOneImage.isNull()) {
                     QImage image = QImage(*(UI::Resources::getTypeOneBlock()));
                     typeOneImage = image.scaled(QSize(blockSize, blockSize));

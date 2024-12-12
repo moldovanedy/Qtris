@@ -23,10 +23,15 @@ namespace UI::Resources
     unsigned char getColorThreeFromPallette();
     unsigned char getColorFourFromPallette();
 
-    void setColorOneFromPallette(unsigned char);
-    void setColorTwoFromPallette(unsigned char);
-    void setColorThreeFromPallette(unsigned char);
-    void setColorFourFromPallette(unsigned char);
+    // void setColorOneFromPallette(unsigned char);
+    // void setColorTwoFromPallette(unsigned char);
+    // void setColorThreeFromPallette(unsigned char);
+    // void setColorFourFromPallette(unsigned char);
+
+    /**
+     * Sets the color of the pieces given the level number.
+     */
+    void setColorsForLevel(unsigned int level);
 
     /**
      * Do NOT use the given image inside UI because it will get deleted internally when the cache is invalidated.

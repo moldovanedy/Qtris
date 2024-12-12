@@ -75,21 +75,23 @@ namespace GameManager {
             }
         }
 
-        /**
-         * Will get the next piece and will try to spawn it. If it fails, it means it's game over.
-         */
-        bool reset();
+        void setLineClearDelay(int frameDelay);
+
         /**
          * Will call the given eventListener (callback) when the piece is locked into the existing pieces or floor.
          */
-        void addPieceLockedEventHandler(Utils::eventListener *callback);
-        bool removePieceLockedEventHandler(Utils::eventListener *callback);
+        void addPieceLockedEventHandler(std::function<void()> callback);
+        bool removePieceLockedEventHandler(std::function<void()> callback);
 
     private:
         CurrentPiece();
         ~CurrentPiece() {};
         static CurrentPiece *_instance;
 
+        /**
+         * Will get the next piece and will try to spawn it. If it fails, it means it's game over.
+         */
+        bool reset();
         /**
          * Will start the ARE time (the spawn delay) and will automatically call reset when needed.
          */
@@ -102,7 +104,6 @@ namespace GameManager {
 
         bool rotateCounterClockwise();
         bool rotateClockwise();
-        void performSoftDrop();
         void moveToLeft();
         void moveToRight();
 
@@ -136,6 +137,7 @@ namespace GameManager {
         int _nextPieceRotation = 0;
         bool _isFirstPiece = true;
 
+        int _lineClearRemainingFrames = 0;
         int _fallFrame = 0;
         //If -1, it means it was invalidated by the game and the only way to restart it is to perform a soft drop 
         //(intended behavior because holding for soft drop after the piece has been locked and ARE is done should NOT use soft drop)

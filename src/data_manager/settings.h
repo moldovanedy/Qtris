@@ -9,7 +9,7 @@ namespace DataManager::Settings {
         None = 0,
         Audio_MainVolume = 1,
         Audio_SfxVolume = 2,
-        Audio_CustomSoundtrack = 3
+        Audio_CustomSoundtrackPath = 3
     };
 
     int getIntSetting(SettingType settingType);

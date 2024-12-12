@@ -16,6 +16,7 @@
 #include "statistics_view.h"
 
 #include "../../game_manager/current_piece.h"
+#include "../../data_manager/runtime_data.h"
 
 namespace UI
 {
@@ -35,12 +36,13 @@ namespace UI
         void redraw();
 
     protected:
-        void paintEvent(QPaintEvent *) override;
         void keyPressEvent(QKeyEvent *e) override;
         void keyReleaseEvent(QKeyEvent *e) override;
 
     private:
         static QFont _pixelFont;
+
+        void onDataChanged();
 
         void createLeftBar(QBoxLayout *columnBox);
         void createRightBar(QBoxLayout *columnBox);

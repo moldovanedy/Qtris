@@ -19,6 +19,12 @@ namespace GameManager {
         bool removeUpdateEventListener(std::function<void()> callback);
         int getFrameCounter();
 
+        inline bool isPaused() { return _isPaused; }
+        inline void togglePause()
+        {
+            _isPaused = !_isPaused;
+        }
+
     private:
         MainLoop(QWidget *parent = nullptr);
         static MainLoop *_instance;
@@ -28,6 +34,8 @@ namespace GameManager {
         int _frameCounter = 0;
         int _fastFrames = 0;
         void invokeEvent();
+
+        bool _isPaused = false;
     };
 }
 #endif
