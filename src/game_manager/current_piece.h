@@ -20,47 +20,47 @@ namespace GameManager {
 
         inline void setSoftDropKeyState(bool isPressed) {
             //NES IMPLEMENTATION: moving a piece will not allow soft drop
-            if (this->_isMoveLeftKeyDown || this->_isMoveRightKeyDown) {
+            if (_isMoveLeftKeyDown || _isMoveRightKeyDown) {
                 return;
             }
 
-            this->_isSoftDropKeyDown = isPressed;
+            _isSoftDropKeyDown = isPressed;
             //NES IMPLEMENTATION: 3 frames for drop to activate
-            this->_softDropFrame = 3;
+            _softDropFrame = 3;
 
             if (!isPressed) {
-                this->_fallFrame = 0;
+                _fallFrame = 0;
             }
         }
 
         inline void setMoveLeftKeyState(bool isPressed) {
             //NES IMPLEMENTATION: soft dropping will not allow moving a piece
-            if (this->_isSoftDropKeyDown) {
+            if (_isSoftDropKeyDown) {
                 return;
             }
-            this->_isMoveLeftKeyDown = isPressed;
+            _isMoveLeftKeyDown = isPressed;
 
             if (isPressed) {
-                this->_dasFrame = 16;
+                _dasFrame = 16;
                 this->moveToLeft();
             }
         }
 
         inline void setMoveRightKeyState(bool isPressed) {
             //NES IMPLEMENTATION: soft dropping will not allow moving a piece
-            if (this->_isSoftDropKeyDown) {
+            if (_isSoftDropKeyDown) {
                 return;
             }
-            this->_isMoveRightKeyDown = isPressed;
+            _isMoveRightKeyDown = isPressed;
 
             if (isPressed) {
-                this->_dasFrame = 16;
+                _dasFrame = 16;
                 this->moveToRight();
             }
         }
 
         inline void setRotateClockwiseKeyState(bool isPressed) {
-            this->_isRotateClockwiseKeyDown = isPressed;
+            _isRotateClockwiseKeyDown = isPressed;
 
             if (isPressed) {
                 this->rotateClockwise();
@@ -68,7 +68,7 @@ namespace GameManager {
         }
 
         inline void setRotateCounterClockwiseKeyState(bool isPressed) {
-            this->_isRotateCounterClockwiseKeyDown = isPressed;
+            _isRotateCounterClockwiseKeyDown = isPressed;
 
             if (isPressed) {
                 this->rotateCounterClockwise();
@@ -129,7 +129,7 @@ namespace GameManager {
         int _columnPosition = 5;
 
         int _startX = 0, _startY = 0, _endX = 0, _endY = 0;
-        int xPos = 5, yPos = 0;
+        int _xPos = 5, _yPos = 0;
         PieceType _pieceType = PieceType::T;
         int _rotation = 0;
 

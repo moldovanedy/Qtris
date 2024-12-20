@@ -1,106 +1,78 @@
 #include "main_view.h"
 
-UI::MainView *UI::MainView::_instance = nullptr;
+using namespace UI::Play;
 
-UI::MainView::MainView(QWidget *parent) : QMainWindow(parent)
-{
-    if (UI::MainView::_instance == nullptr) {
-        UI::MainView::_instance = this;
+MainView *MainView::_instance = nullptr;
+
+MainView::MainView(QWidget *parent) : QWidget(parent) {
+    if (MainView::_instance == nullptr) {
+        MainView::_instance = this;
     }
 
-    this->setMinimumHeight(625);
-    this->setMinimumWidth(900);
-
-    this->_menuBar = new MenuBar(parent);
-    this->setMenuBar(this->_menuBar);
-    this->setCentralWidget(MainView::getStackPanel());
-    this->showMaximized();
-}
-
-UI::MainView::~MainView() {}
-
-UI::MainView *UI::MainView::getInstance()
-{
-    if (UI::MainView::_instance == nullptr) {
-        UI::MainView::_instance = new MainView();
-    }
-
-    return UI::MainView::_instance;
-}
-
-QStackedWidget *UI::MainView::getStackPanel()
-{
-    this->mainStackPanel = new QStackedWidget();
-    this->mainStackPanel->setStyleSheet("background-image: url(:/assets/bg.png); background-repeat: repeat-xy;");
-
-    QWidget *verticalWrapper = new QWidget();
-    verticalWrapper->setStyleSheet("background-image: url();");
-    this->_verticalContainer = new QBoxLayout(QBoxLayout::Direction::TopToBottom, verticalWrapper);
-    this->_verticalContainer->setSpacing(0);
-    this->_verticalContainer->setContentsMargins(0, 0, 0, 0);
+    this->setStyleSheet("background-image: url();");
+    QBoxLayout *verticalBoxContainer = new QBoxLayout(QBoxLayout::Direction::TopToBottom, this);
+    verticalBoxContainer->setSpacing(0);
+    verticalBoxContainer->setContentsMargins(0, 0, 0, 0);
 
     // add to verticalContainer
     {
         QWidget *topSpacer = new QWidget();
-        this->_verticalContainer->addWidget(topSpacer, 1);
+        verticalBoxContainer->addWidget(topSpacer, 1);
 
-        this->_horizontalContainer = new QBoxLayout(QBoxLayout::Direction::LeftToRight);
-        this->_horizontalContainer->setSpacing(0);
-        this->_horizontalContainer->setContentsMargins(0, 0, 0, 0);
+        QBoxLayout *horizontalBoxContainer = new QBoxLayout(QBoxLayout::Direction::LeftToRight);
+        horizontalBoxContainer->setSpacing(0);
+        horizontalBoxContainer->setContentsMargins(0, 0, 0, 0);
 
         // add to horizontalContainer
         {
             QWidget *leftSpacer = new QWidget();
-            this->_horizontalContainer->addWidget(leftSpacer, 1);
+            horizontalBoxContainer->addWidget(leftSpacer, 1);
 
-            this->_mainContent = new UI::PlayArea();
-            this->_horizontalContainer->addWidget(this->_mainContent);
+            _mainContent = new PlayArea();
+            horizontalBoxContainer->addWidget(_mainContent);
 
             QWidget *rightSpacer = new QWidget();
-            this->_horizontalContainer->addWidget(rightSpacer, 1);
+            horizontalBoxContainer->addWidget(rightSpacer, 1);
 
-            this->_verticalContainer->addLayout(this->_horizontalContainer);
+            verticalBoxContainer->addLayout(horizontalBoxContainer);
         }
 
         QWidget *bottomSpacer = new QWidget();
-        this->_verticalContainer->addWidget(bottomSpacer, 1);
+        verticalBoxContainer->addWidget(bottomSpacer, 1);
     }
-    this->mainStackPanel->addWidget(verticalWrapper);
-
-    this->mainStackPanel->addWidget(GameManager::MainLoop::getInstance());
-
-    this->_pauseScreen = new QLabel("PAUSED", this->mainStackPanel);
-    this->_pauseScreen->setFont(PlayArea::getDataPixelFont());
-    this->_pauseScreen->setAlignment(Qt::AlignCenter);
-    this->_pauseScreen->setStyleSheet("font-size: 45px; background-color: #000; background-image: url();");
-    this->_pauseScreen->setVisible(false);
-
-    return this->mainStackPanel;
 }
 
-void UI::MainView::setPauseScreenVisibility(bool shouldMakeVisible)
+MainView::~MainView() {
+    MainView::_instance = nullptr;
+}
+
+MainView *MainView::getInstance()
 {
-    this->_pauseScreen->setVisible(shouldMakeVisible);
+    if (MainView::_instance == nullptr) {
+        MainView::_instance = new MainView();
+    }
+
+    return MainView::_instance;
 }
 
-void UI::MainView::resizeEvent(QResizeEvent *e)
+void MainView::resizeEvent(QResizeEvent *e)
 {
     QSize windowSize = e->size();
-    windowSize.setHeight(windowSize.height() - this->_menuBar->height());
+    windowSize.setHeight(windowSize.height() - MainWindow::getInstance()->getMenuBarHeight());
 
     float aspectRatio = windowSize.width() / (float)windowSize.height();
-    this->_pauseScreen->setFixedSize(windowSize.width(), windowSize.height());
+    MainWindow::getInstance()->setPauseScreenSize(windowSize.width(), windowSize.height());
 
     // height matters
     if (aspectRatio > 1.5)
     {
         int height = windowSize.height();
-        this->_mainContent->setFixedSize(height * 1.5, height);
+        _mainContent->setFixedSize(height * 1.5, height);
     }
     // width matters
     else
     {
         int width = windowSize.width();
-        this->_mainContent->setFixedSize(width, width * 0.66666667);
+        _mainContent->setFixedSize(width, width * 0.66666667);
     }
 }

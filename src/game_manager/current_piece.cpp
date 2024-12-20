@@ -4,9 +4,9 @@ GameManager::CurrentPiece *GameManager::CurrentPiece::_instance = nullptr;
 
 GameManager::CurrentPiece::CurrentPiece() {
     //this->reset();
-    this->_pieceLockedEvent = new Utils::Event();
-    this->_updateCallback = std::bind(&GameManager::CurrentPiece::onUpdate, this);
-    MainLoop::getInstance()->addUpdateEventListener(this->_updateCallback);
+    _pieceLockedEvent = new Utils::Event();
+    _updateCallback = std::bind(&GameManager::CurrentPiece::onUpdate, this);
+    MainLoop::getInstance()->addUpdateEventListener(_updateCallback);
 }
 
 DataManager::PieceData::PieceType GameManager::CurrentPiece::generateNextPiece() {
@@ -29,29 +29,29 @@ GameManager::CurrentPiece *GameManager::CurrentPiece::getInstance() {
 }
 
 void GameManager::CurrentPiece::onUpdate() {
-    if (this->_areRemainingFrames > 0) {
-        this->_areRemainingFrames--;
+    if (_areRemainingFrames > 0) {
+        _areRemainingFrames--;
         return;
     }
-    if (this->_lineClearRemainingFrames > 0) {
-        this->_lineClearRemainingFrames--;
+    if (_lineClearRemainingFrames > 0) {
+        _lineClearRemainingFrames--;
         return;
     }
 
-    if (this->_isAreActive) {
+    if (_isAreActive) {
         this->reset();
-        this->_isAreActive = false;
+        _isAreActive = false;
         //prevent further soft drop
-        this->_softDropFrame = -1;
+        _softDropFrame = -1;
         return;
     }
 
-    if (this->_isMoveLeftKeyDown || this->_isMoveRightKeyDown) {
-        this->_dasFrame--;
-        if (this->_dasFrame == 0) {
-            this->_dasFrame = 6;
+    if (_isMoveLeftKeyDown || _isMoveRightKeyDown) {
+        _dasFrame--;
+        if (_dasFrame == 0) {
+            _dasFrame = 6;
 
-            if (this->_isMoveLeftKeyDown) {
+            if (_isMoveLeftKeyDown) {
                 this->moveToLeft();
             }
             else {
@@ -61,127 +61,127 @@ void GameManager::CurrentPiece::onUpdate() {
     }
 
     //NES IMPLEMENTATION UNCLEAR: does soft drop allow a normal gravity drop until the soft drop or not (implemented as no)?
-    if (this->_isSoftDropKeyDown) {
-        if (this->_softDropFrame == 0) {
+    if (_isSoftDropKeyDown) {
+        if (_softDropFrame == 0) {
             this->performFall();
-            this->_softDropFrame = 1;
+            _softDropFrame = 1;
             return;
         }
-        else if (this->_softDropFrame != -1) {
-            this->_softDropFrame--;
+        else if (_softDropFrame != -1) {
+            _softDropFrame--;
             return;
         }
     }
 
     //we DO need to use a separate fall frame counter to correctly implement ARE
-    this->_fallFrame++;
+    _fallFrame++;
 
-    if (this->_fallFrame % DataManager::RuntimeData::getGravitySpeed() == 0) {
+    if (_fallFrame % DataManager::RuntimeData::getGravitySpeed() == 0) {
         this->performFall();
     }
 }
 
 void GameManager::CurrentPiece::setLineClearDelay(int frameDelay) {
-    this->_isAreActive = false;
-    this->_areRemainingFrames = 0;
+    _isAreActive = false;
+    _areRemainingFrames = 0;
 
-    this->_lineClearRemainingFrames = frameDelay;
+    _lineClearRemainingFrames = frameDelay;
 }
 
 void GameManager::CurrentPiece::getCurrentPieceData(PieceType &pieceType, int &rotation) {
-    pieceType = this->_pieceType;
-    rotation = this->_rotation;
+    pieceType = _pieceType;
+    rotation = _rotation;
 }
 
 void GameManager::CurrentPiece::getNextPieceData(PieceType &pieceType, int &rotation) {
-    pieceType = this->_nextPieceType;
-    rotation = this->_nextPieceRotation;
+    pieceType = _nextPieceType;
+    rotation = _nextPieceRotation;
 }
 
 bool GameManager::CurrentPiece::reset() {
-    if (this->_isFirstPiece) {
-        this->_nextPieceType = this->generateNextPiece();
-        this->_pieceLockedEvent->invoke();
-        this->_nextPieceRotation = DataManager::PieceData::getDefaultRotationForPiece(this->_nextPieceType);
-        this->_isFirstPiece = false;
+    if (_isFirstPiece) {
+        _nextPieceType = this->generateNextPiece();
+        _pieceLockedEvent->invoke();
+        _nextPieceRotation = DataManager::PieceData::getDefaultRotationForPiece(_nextPieceType);
+        _isFirstPiece = false;
 
-        this->_lastUsedIndices[0] = 0;
-        this->_lastUsedIndices[1] = 0;
-        this->_lastUsedIndices[2] = 0;
-        this->_lastUsedIndices[3] = 0;
-        this->_fallFrame = 0;
+        _lastUsedIndices[0] = 0;
+        _lastUsedIndices[1] = 0;
+        _lastUsedIndices[2] = 0;
+        _lastUsedIndices[3] = 0;
+        _fallFrame = 0;
     }
 
-    this->_pieceType = this->_nextPieceType;
-    this->_rotation = this->_nextPieceRotation;
+    _pieceType = _nextPieceType;
+    _rotation = _nextPieceRotation;
 
-    delete[] this->_cachedLayout;
-    this->_cachedLayout = DataManager::PieceData::getPieceLayout(this->_pieceType, -1);
-    DataManager::PieceData::getLayoutBounds(this->_cachedLayout, this->_startX, this->_startY, this->_endX, this->_endY);
-    this->xPos = 5;
-    this->yPos = 0;
+    delete[] _cachedLayout;
+    _cachedLayout = DataManager::PieceData::getPieceLayout(_pieceType, -1);
+    DataManager::PieceData::getLayoutBounds(_cachedLayout, _startX, _startY, _endX, _endY);
+    _xPos = 5;
+    _yPos = 0;
 
     //check for game over
     for (int row = 0; row < 5; row++) {
         for (int column = 0; column < 5; column++) {
-            if (this->_cachedLayout[row * 5 + column] == 0) {
+            if (_cachedLayout[row * 5 + column] == 0) {
                 continue;
             }
 
-            int thisRow = this->yPos - 2 + row, thisColumn = this->xPos - 2 + column;
+            int thisRow = _yPos - 2 + row, thisColumn = _xPos - 2 + column;
             if (GameManager::PlayField::getInstance()->getSquareType(thisRow, thisColumn)) {
-                MainLoop::getInstance()->removeUpdateEventListener(this->_updateCallback);
+                MainLoop::getInstance()->removeUpdateEventListener(_updateCallback);
                 CurrentPiece::_instance = nullptr;
-                this->_pieceLockedEvent->clearAllListeners();
+                _pieceLockedEvent->clearAllListeners();
 
                 return false;
             }
         }
     }
 
-    this->_nextPieceType = this->generateNextPiece();
-    this->_nextPieceRotation = DataManager::PieceData::getDefaultRotationForPiece(this->_nextPieceType);
+    _nextPieceType = this->generateNextPiece();
+    _nextPieceRotation = DataManager::PieceData::getDefaultRotationForPiece(_nextPieceType);
 
-    this->_lastUsedIndices[0] = 0;
-    this->_lastUsedIndices[1] = 0;
-    this->_lastUsedIndices[2] = 0;
-    this->_lastUsedIndices[3] = 0;
+    _lastUsedIndices[0] = 0;
+    _lastUsedIndices[1] = 0;
+    _lastUsedIndices[2] = 0;
+    _lastUsedIndices[3] = 0;
 
     this->redoLayout();
     return true;
 }
 
 bool GameManager::CurrentPiece::rotateCounterClockwise() {
-    if (!this->canRotateCounterClockwise() || this->_isAreActive) {
+    if (!this->canRotateCounterClockwise() || _isAreActive) {
         return false;
     }
 
-    this->_rotation = (this->_rotation - 1) % 4;
-    if (this->_rotation == -1) {
-        this->_rotation = 3;
+    _rotation = (_rotation - 1) % 4;
+    if (_rotation == -1) {
+        _rotation = 3;
     }
 
     delete[] _cachedLayout;
-    _cachedLayout = DataManager::PieceData::getPieceLayout(this->_pieceType, this->_rotation);
-    DataManager::PieceData::getLayoutBounds(_cachedLayout, this->_startX, this->_startY, this->_endX, this->_endY);
+    _cachedLayout = DataManager::PieceData::getPieceLayout(_pieceType, _rotation);
+    DataManager::PieceData::getLayoutBounds(_cachedLayout, _startX, _startY, _endX, _endY);
 
     this->redoLayout();
     return true;
 }
 
 bool GameManager::CurrentPiece::rotateClockwise() {
-    if (!this->canRotateClockwise() || this->_isAreActive) {
+    if (!this->canRotateClockwise() || _isAreActive) {
         return false;
     }
 
-    this->_rotation = (this->_rotation + 1) % 4;
-    if (this->_rotation == -1) {
-        this->_rotation = 3;
+    _rotation = (_rotation + 1) % 4;
+    if (_rotation == -1) {
+        _rotation = 3;
     }
 
     delete[] _cachedLayout;
-    _cachedLayout = DataManager::PieceData::getPieceLayout(this->_pieceType, this->_rotation);
-    DataManager::PieceData::getLayoutBounds(_cachedLayout, this->_startX, this->_startY, this->_endX, this->_endY);
+    _cachedLayout = DataManager::PieceData::getPieceLayout(_pieceType, _rotation);
+    DataManager::PieceData::getLayoutBounds(_cachedLayout, _startX, _startY, _endX, _endY);
 
     this->redoLayout();
     return true;
@@ -190,35 +190,35 @@ bool GameManager::CurrentPiece::rotateClockwise() {
 void GameManager::CurrentPiece::performFall() {
     if (!this->canMoveDown()) {
         this->passControlToAre();
-        this->_pieceLockedEvent->invoke();
+        _pieceLockedEvent->invoke();
         return;
     }
 
-    this->yPos++;
+    _yPos++;
     this->redoLayout();
 }
 
 void GameManager::CurrentPiece::moveToLeft() {
-    if (!this->canMoveLeft() || this->_isAreActive) {
+    if (!this->canMoveLeft() || _isAreActive) {
         return;
     }
 
-    this->xPos--;
+    _xPos--;
     this->redoLayout();
 }
 
 void GameManager::CurrentPiece::moveToRight() {
-    if (!this->canMoveRight() || this->_isAreActive) {
+    if (!this->canMoveRight() || _isAreActive) {
         return;
     }
 
-    this->xPos++;
+    _xPos++;
     this->redoLayout();
 }
 
 void GameManager::CurrentPiece::passControlToAre() {
     int frames = 10;
-    int positionOfPieceBottom = this->yPos + (this->_endY - 2);
+    int positionOfPieceBottom = _yPos + (_endY - 2);
 
     //NES IMPLEMENTATION: 10 for the 2 bottom rows, for each 4 rows an additional 2 frames are added
     if (positionOfPieceBottom >= 18) {
@@ -237,23 +237,23 @@ void GameManager::CurrentPiece::passControlToAre() {
         frames = 18;
     }
 
-    this->_areRemainingFrames = frames;
-    this->_isAreActive = true;
+    _areRemainingFrames = frames;
+    _isAreActive = true;
 }
 
 void GameManager::CurrentPiece::addPieceLockedEventHandler(std::function<void()> callback) {
-    this->_pieceLockedEvent->addListener(callback);
+    _pieceLockedEvent->addListener(callback);
 }
 
 bool GameManager::CurrentPiece::removePieceLockedEventHandler(std::function<void()> callback) {
-    return this->_pieceLockedEvent->removeListener(callback);
+    return _pieceLockedEvent->removeListener(callback);
 }
 
 
 void GameManager::CurrentPiece::redoLayout() {
     //clear the last blocks (repaint)
     for (int i = 0; i < 4; i++) {
-        GameManager::PlayField::getInstance()->setSquareType(this->_lastUsedIndices[i] / 10, this->_lastUsedIndices[i] % 10, 0);
+        GameManager::PlayField::getInstance()->setSquareType(_lastUsedIndices[i] / 10, _lastUsedIndices[i] % 10, 0);
     }
 
     int piece = 0;
@@ -261,11 +261,11 @@ void GameManager::CurrentPiece::redoLayout() {
         for (int column = 0; column < 5; column++) {
             if (_cachedLayout[row * 5 + column] != 0) {
                 //determine the global indices (from the play field), not the local ones from the layout
-                int thisRow = this->yPos - 2 + row, thisColumn = this->xPos - 2 + column;
+                int thisRow = _yPos - 2 + row, thisColumn = _xPos - 2 + column;
                 GameManager::PlayField::getInstance()->setSquareType(thisRow, thisColumn, _cachedLayout[row * 5 + column]);
 
                 assert((piece < 4) && "More than 4 blocks found");
-                this->_lastUsedIndices[piece] = thisRow * 10 + thisColumn;
+                _lastUsedIndices[piece] = thisRow * 10 + thisColumn;
                 piece++;
             }
         }
@@ -273,7 +273,7 @@ void GameManager::CurrentPiece::redoLayout() {
 }
 
 bool GameManager::CurrentPiece::canMoveDown() {
-    if (this->yPos + (this->_endY - 2) + 1 >= 20) {
+    if (_yPos + (_endY - 2) + 1 >= 20) {
         return false;
     }
 
@@ -281,7 +281,7 @@ bool GameManager::CurrentPiece::canMoveDown() {
         //the lowest in the local layout
         int lowestRow = -1;
         for (int row = 0; row < 5; row++) {
-            if (this->_cachedLayout[row * 5 + column] != 0) {
+            if (_cachedLayout[row * 5 + column] != 0) {
                 lowestRow = row;
             }
         }
@@ -290,7 +290,7 @@ bool GameManager::CurrentPiece::canMoveDown() {
             continue;
         }
 
-        int thisRow = this->yPos - 2 + lowestRow, thisColumn = this->xPos - 2 + column;
+        int thisRow = _yPos - 2 + lowestRow, thisColumn = _xPos - 2 + column;
         if (GameManager::PlayField::getInstance()->getSquareType(thisRow + 1, thisColumn) != 0) {
             return false;
         }
@@ -301,14 +301,14 @@ bool GameManager::CurrentPiece::canMoveDown() {
 
 bool GameManager::CurrentPiece::canMoveLeft() {
     //if the piece would exit the screen, return
-    if (this->xPos + (this->_startX - 2) - 1 < 0) {
+    if (_xPos + (_startX - 2) - 1 < 0) {
         return false;
     }
 
     for (int row = 0; row < 5; row++) {
         int leftMostColumn = 5;
         for (int column = 4; column >= 0; column--) {
-            if (this->_cachedLayout[row * 5 + column] != 0) {
+            if (_cachedLayout[row * 5 + column] != 0) {
                 leftMostColumn = column;
             }
         }
@@ -317,7 +317,7 @@ bool GameManager::CurrentPiece::canMoveLeft() {
             continue;
         }
 
-        int thisRow = this->yPos - 2 + row, thisColumn = this->xPos - 2 + leftMostColumn;
+        int thisRow = _yPos - 2 + row, thisColumn = _xPos - 2 + leftMostColumn;
         if (GameManager::PlayField::getInstance()->getSquareType(thisRow, thisColumn - 1) != 0) {
             return false;
         }
@@ -328,14 +328,14 @@ bool GameManager::CurrentPiece::canMoveLeft() {
 
 bool GameManager::CurrentPiece::canMoveRight() {
     //if the piece would exit the screen, return
-    if (this->xPos + (this->_endX - 2) + 1 >= 10) {
+    if (_xPos + (_endX - 2) + 1 >= 10) {
         return false;
     }
 
     for (int row = 0; row < 5; row++) {
         int rightMostColumn = -1;
         for (int column = 0; column < 5; column++) {
-            if (this->_cachedLayout[row * 5 + column] != 0) {
+            if (_cachedLayout[row * 5 + column] != 0) {
                 rightMostColumn = column;
             }
         }
@@ -344,7 +344,7 @@ bool GameManager::CurrentPiece::canMoveRight() {
             continue;
         }
 
-        int thisRow = this->yPos - 2 + row, thisColumn = this->xPos - 2 + rightMostColumn;
+        int thisRow = _yPos - 2 + row, thisColumn = _xPos - 2 + rightMostColumn;
         if (GameManager::PlayField::getInstance()->getSquareType(thisRow, thisColumn + 1) != 0) {
             return false;
         }
@@ -354,18 +354,18 @@ bool GameManager::CurrentPiece::canMoveRight() {
 }
 
 bool GameManager::CurrentPiece::canRotateClockwise() {
-    unsigned char *projectedLayout = DataManager::PieceData::getPieceLayout(this->_pieceType, this->_rotation + 1);
+    unsigned char *projectedLayout = DataManager::PieceData::getPieceLayout(_pieceType, _rotation + 1);
 
     for (int row = 0; row < 5; row++) {
         for (int column = 0; column < 5; column++) {
             //if it is empty in the projected layout or if it's the same block as the one from the current rotation, skip it
             if (projectedLayout[row * 5 + column] == 0 ||
-                (this->_cachedLayout[row * 5 + column] == projectedLayout[row * 5 + column]))
+                (_cachedLayout[row * 5 + column] == projectedLayout[row * 5 + column]))
             {
                 continue;
             }
 
-            int thisRow = this->yPos - 2 + row, thisColumn = this->xPos - 2 + column;
+            int thisRow = _yPos - 2 + row, thisColumn = _xPos - 2 + column;
             //if only one piece will occupy an already occupied block, then it's already impossible to rotate
             //if the piece would get outside the play field, you can not rotate
             if (GameManager::PlayField::getInstance()->getSquareType(thisRow, thisColumn) != 0 ||
@@ -381,18 +381,18 @@ bool GameManager::CurrentPiece::canRotateClockwise() {
 }
 
 bool GameManager::CurrentPiece::canRotateCounterClockwise() {
-    unsigned char *projectedLayout = DataManager::PieceData::getPieceLayout(this->_pieceType, this->_rotation - 1);
+    unsigned char *projectedLayout = DataManager::PieceData::getPieceLayout(_pieceType, _rotation - 1);
 
     for (int row = 0; row < 5; row++) {
         for (int column = 0; column < 5; column++) {
             //if it's the same block as the one from the current rotation, skip it
             if (projectedLayout[row * 5 + column] == 0 ||
-                (this->_cachedLayout[row * 5 + column] == projectedLayout[row * 5 + column]))
+                (_cachedLayout[row * 5 + column] == projectedLayout[row * 5 + column]))
             {
                 continue;
             }
 
-            int thisRow = this->yPos - 2 + row, thisColumn = this->xPos - 2 + column;
+            int thisRow = _yPos - 2 + row, thisColumn = _xPos - 2 + column;
             //if only one piece will occupy an already occupied block, then it's already impossible to rotate
             //if the piece would get outside the play field, you can not rotate
             if (GameManager::PlayField::getInstance()->getSquareType(thisRow, thisColumn) != 0 ||

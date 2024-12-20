@@ -11,7 +11,7 @@
 #include "../../data_manager/piece_data.h"
 #include "../../game_manager/current_piece.h"
 
-namespace UI
+namespace UI::Play
 {
     class StatisticsView : public QWidget
     {

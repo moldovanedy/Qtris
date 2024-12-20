@@ -2,7 +2,7 @@
 
 GameManager::PlayField::PlayField() {
     // for (int i = 0; i < 50; i++) {
-    //     this->_playField[i] = 0b01010101;
+    //     _playField[i] = 0b01010101;
     // }
 }
 
@@ -25,7 +25,7 @@ bool GameManager::PlayField::isSquareFree(int row, int column) {
     int indexOfByte = virtualIndex / 8;
     int indexInByte = virtualIndex % 8; //only for the first bit is enough
 
-    return (this->_playField[indexOfByte] & (0b11 << indexInByte)) == 0;
+    return (_playField[indexOfByte] & (0b11 << indexInByte)) == 0;
 }
 
 int GameManager::PlayField::getSquareType(int row, int column) {
@@ -37,8 +37,8 @@ int GameManager::PlayField::getSquareType(int row, int column) {
     int indexOfByte = virtualIndex / 8;
     int indexInByte = virtualIndex % 8; //only for the first bit is enough
 
-    int lsb = this->_playField[indexOfByte] & (1 << indexInByte);
-    int msb = this->_playField[indexOfByte] & (1 << (indexInByte + 1));
+    int lsb = _playField[indexOfByte] & (1 << indexInByte);
+    int msb = _playField[indexOfByte] & (1 << (indexInByte + 1));
 
     return (lsb != 0) | ((msb != 0) << 1);
 }
@@ -57,16 +57,16 @@ void GameManager::PlayField::setSquareType(int row, int column, int squareType) 
     int indexInByte = virtualIndex % 8; //only for the first bit is enough
 
     if ((squareType & 1) == 0) {
-        this->_playField[indexOfByte] &= ~(1 << indexInByte);
+        _playField[indexOfByte] &= ~(1 << indexInByte);
     }
     else {
-        this->_playField[indexOfByte] |= 1 << indexInByte;
+        _playField[indexOfByte] |= 1 << indexInByte;
     }
 
     if (((squareType >> 1) & 1) == 0) {
-        this->_playField[indexOfByte] &= ~(1 << (indexInByte + 1));
+        _playField[indexOfByte] &= ~(1 << (indexInByte + 1));
     }
     else {
-        this->_playField[indexOfByte] |= 1 << (indexInByte + 1);
+        _playField[indexOfByte] |= 1 << (indexInByte + 1);
     }
 }

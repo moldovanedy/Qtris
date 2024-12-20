@@ -3,10 +3,10 @@
 GameManager::MainLoop *GameManager::MainLoop::_instance = nullptr;
 
 GameManager::MainLoop::MainLoop(QWidget *parent) : QWidget(parent) {
-    this->_updateEvent = new Utils::Event();
-    this->_timer = new QTimer(this);
-    this->connect(this->_timer, &QTimer::timeout, this, QOverload<>::of(&MainLoop::invokeEvent));
-    this->_timer->start(16);
+    _updateEvent = new Utils::Event();
+    _timer = new QTimer(this);
+    this->connect(_timer, &QTimer::timeout, this, QOverload<>::of(&MainLoop::invokeEvent));
+    _timer->start(16);
 }
 
 GameManager::MainLoop *GameManager::MainLoop::getInstance() {
@@ -18,11 +18,11 @@ GameManager::MainLoop *GameManager::MainLoop::getInstance() {
 }
 
 void GameManager::MainLoop::addUpdateEventListener(std::function<void()> callback) {
-    this->_updateEvent->addListener(callback);
+    _updateEvent->addListener(callback);
 }
 
 bool GameManager::MainLoop::removeUpdateEventListener(std::function<void()> callback) {
-    return this->_updateEvent->removeListener(callback);
+    return _updateEvent->removeListener(callback);
 }
 
 /**
@@ -39,13 +39,13 @@ void GameManager::MainLoop::invokeEvent() {
 
     if (_fastFrames >= 3) {
         _fastFrames = 0;
-        this->_timer->setInterval(17);
+        _timer->setInterval(17);
     }
     else if (_fastFrames == 0) {
-        this->_timer->setInterval(16);
+        _timer->setInterval(16);
     }
 
     _fastFrames++;
-    this->_updateEvent->invoke();
+    _updateEvent->invoke();
     _frameCounter++;
 }

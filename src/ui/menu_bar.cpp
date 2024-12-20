@@ -1,5 +1,7 @@
 #include "menu_bar.h"
 
+using namespace UI;
+
 MenuBar::MenuBar(QWidget *parent) : QMenuBar(parent)
 {
     this->addMenu(getGameMenu());

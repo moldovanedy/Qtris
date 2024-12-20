@@ -1,5 +1,8 @@
 #include "piece_manager.h"
 
+using namespace UI::Play;
+using namespace DataManager;
+
 //initialized to the colors of level 1
 static unsigned int _currentPalette = (0x0f << 24) | (0x30 << 16) | (0x21 << 8) | 0x12;
 
@@ -76,53 +79,53 @@ static QImage **_cachedIArray = new QImage * [4];
 
 static bool _isCacheValid = false;
 
-QImage *UI::Resources::getPieceImage(DataManager::PieceData::PieceType pieceType, int rotation, QPoint &spawnPoint) {
+QImage *Resources::getPieceImage(PieceData::PieceType pieceType, int rotation, QPoint &spawnPoint) {
     if (!_isCacheValid) {
         recreateCachedImagesForPiece();
     }
 
     if (rotation < 0) {
-        rotation = DataManager::PieceData::getDefaultRotationForPiece(pieceType);
+        rotation = PieceData::getDefaultRotationForPiece(pieceType);
     }
 
     switch (pieceType) {
-    case DataManager::PieceData::PieceType::T:
+    case PieceData::PieceType::T:
         return _cachedTArray[rotation];
-    case DataManager::PieceData::PieceType::J:
+    case PieceData::PieceType::J:
         return _cachedJArray[rotation];
-    case DataManager::PieceData::PieceType::Z:
+    case PieceData::PieceType::Z:
         return _cachedZArray[rotation];
-    case DataManager::PieceData::PieceType::O:
+    case PieceData::PieceType::O:
         return _cachedOArray[rotation];
-    case DataManager::PieceData::PieceType::S:
+    case PieceData::PieceType::S:
         return _cachedSArray[rotation];
-    case DataManager::PieceData::PieceType::L:
+    case PieceData::PieceType::L:
         return _cachedLArray[rotation];
-    case DataManager::PieceData::PieceType::I:
+    case PieceData::PieceType::I:
         return _cachedIArray[rotation];
     }
     return new QImage();
 }
 
-unsigned char UI::Resources::getColorOneFromPallette() {
+unsigned char Resources::getColorOneFromPallette() {
     return _currentPalette >> 24;
 }
 
-unsigned char UI::Resources::getColorTwoFromPallette() {
+unsigned char Resources::getColorTwoFromPallette() {
     return _currentPalette >> 16;
 }
 
-unsigned char UI::Resources::getColorThreeFromPallette() {
+unsigned char Resources::getColorThreeFromPallette() {
     return _currentPalette >> 8;
 }
 
-unsigned char UI::Resources::getColorFourFromPallette() {
+unsigned char Resources::getColorFourFromPallette() {
     return _currentPalette;
 }
 
 static void setColorOneFromPallette(unsigned char palletteValue) {
     if (palletteValue >= 0x40) {
-        throw std::invalid_argument("Invalid pallette index at UI::Resources::setColorOneFromPallette");
+        throw std::invalid_argument("Invalid pallette index at Resources::setColorOneFromPallette");
     }
 
     _currentPalette = (_currentPalette & 0x00ffffff) | ((int)palletteValue << 24);
@@ -131,7 +134,7 @@ static void setColorOneFromPallette(unsigned char palletteValue) {
 
 static void setColorTwoFromPallette(unsigned char palletteValue) {
     if (palletteValue >= 0x40) {
-        throw std::invalid_argument("Invalid pallette index at UI::Resources::setColorTwoFromPallette");
+        throw std::invalid_argument("Invalid pallette index at Resources::setColorTwoFromPallette");
     }
 
     _currentPalette = (_currentPalette & 0xff00ffff) | ((int)palletteValue << 16);
@@ -140,7 +143,7 @@ static void setColorTwoFromPallette(unsigned char palletteValue) {
 
 static void setColorThreeFromPallette(unsigned char palletteValue) {
     if (palletteValue >= 0x40) {
-        throw std::invalid_argument("Invalid pallette index at UI::Resources::setColorThreeFromPallette");
+        throw std::invalid_argument("Invalid pallette index at Resources::setColorThreeFromPallette");
     }
 
     _currentPalette = (_currentPalette & 0xffff00ff) | ((int)palletteValue << 8);
@@ -149,7 +152,7 @@ static void setColorThreeFromPallette(unsigned char palletteValue) {
 
 static void setColorFourFromPallette(unsigned char palletteValue) {
     if (palletteValue >= 0x40) {
-        throw std::invalid_argument("Invalid pallette index at UI::Resources::setColorFourFromPallette");
+        throw std::invalid_argument("Invalid pallette index at Resources::setColorFourFromPallette");
     }
 
     _currentPalette = (_currentPalette & 0xffffff00) | (int)palletteValue;
@@ -158,7 +161,7 @@ static void setColorFourFromPallette(unsigned char palletteValue) {
 
 unsigned int _lastLevel = 0;
 
-void UI::Resources::setColorsForLevel(unsigned int level) {
+void Resources::setColorsForLevel(unsigned int level) {
     //TODO: also implement glitched colors
     if (_lastLevel == level) {
         return;
@@ -173,7 +176,7 @@ void UI::Resources::setColorsForLevel(unsigned int level) {
 }
 
 
-QImage *UI::Resources::getTypeOneBlock() {
+QImage *Resources::getTypeOneBlock() {
     if (!_isCacheValid)
     {
         _cachedBlockTypeOne = new QImage(QSize(8, 8), QImage::Format_RGB888);
@@ -183,7 +186,7 @@ QImage *UI::Resources::getTypeOneBlock() {
     return _cachedBlockTypeOne;
 }
 
-QImage *UI::Resources::getTypeTwoBlock() {
+QImage *Resources::getTypeTwoBlock() {
     if (!_isCacheValid)
     {
         _cachedBlockTypeTwo = new QImage(QSize(8, 8), QImage::Format_RGB888);
@@ -193,7 +196,7 @@ QImage *UI::Resources::getTypeTwoBlock() {
     return _cachedBlockTypeTwo;
 }
 
-QImage *UI::Resources::getTypeThreeBlock() {
+QImage *Resources::getTypeThreeBlock() {
     if (!_isCacheValid)
     {
         _cachedBlockTypeThree = new QImage(QSize(8, 8), QImage::Format_RGB888);
@@ -203,7 +206,7 @@ QImage *UI::Resources::getTypeThreeBlock() {
     return _cachedBlockTypeThree;
 }
 
-void UI::Resources::paintImage(QImage *image, int blockType) {
+void Resources::paintImage(QImage *image, int blockType) {
     unsigned char *data;
     switch (blockType)
     {
@@ -243,14 +246,14 @@ void UI::Resources::paintImage(QImage *image, int blockType) {
     }
 }
 
-static void UI::Resources::recreateCachedImagesForPiece() {
+static void Resources::recreateCachedImagesForPiece() {
     for (int piece = 0; piece < 7; piece++) {
-        DataManager::PieceData::PieceType pieceType = (DataManager::PieceData::PieceType)piece;
+        PieceData::PieceType pieceType = (PieceData::PieceType)piece;
 
         for (int rot = 0; rot < 4; rot++) {
-            unsigned char *layout = DataManager::PieceData::getPieceLayout(pieceType, rot);
+            unsigned char *layout = PieceData::getPieceLayout(pieceType, rot);
             int startX = 4, startY = 4, endX = 0, endY = 0;
-            DataManager::PieceData::getLayoutBounds(layout, startX, startY, endX, endY);
+            PieceData::getLayoutBounds(layout, startX, startY, endX, endY);
 
             assert((endX >= startX) && "endX smaller than startX");
             assert((endY >= startY) && "endY smaller than startY");
@@ -269,13 +272,13 @@ static void UI::Resources::recreateCachedImagesForPiece() {
                     switch (layout[row * 5 + column])
                     {
                     case 1:
-                        block = UI::Resources::getTypeOneBlock();
+                        block = Resources::getTypeOneBlock();
                         break;
                     case 2:
-                        block = UI::Resources::getTypeTwoBlock();
+                        block = Resources::getTypeTwoBlock();
                         break;
                     case 3:
-                        block = UI::Resources::getTypeThreeBlock();
+                        block = Resources::getTypeThreeBlock();
                         break;
                     }
 
@@ -291,31 +294,31 @@ static void UI::Resources::recreateCachedImagesForPiece() {
             }
 
             switch (pieceType) {
-            case DataManager::PieceData::PieceType::T:
+            case PieceData::PieceType::T:
                 delete _cachedTArray[rot];
                 _cachedTArray[rot] = finalImage;
                 break;
-            case DataManager::PieceData::PieceType::J:
+            case PieceData::PieceType::J:
                 delete _cachedJArray[rot];
                 _cachedJArray[rot] = finalImage;
                 break;
-            case DataManager::PieceData::PieceType::Z:
+            case PieceData::PieceType::Z:
                 delete _cachedZArray[rot];
                 _cachedZArray[rot] = finalImage;
                 break;
-            case DataManager::PieceData::PieceType::O:
+            case PieceData::PieceType::O:
                 delete _cachedOArray[rot];
                 _cachedOArray[rot] = finalImage;
                 break;
-            case DataManager::PieceData::PieceType::S:
+            case PieceData::PieceType::S:
                 delete _cachedSArray[rot];
                 _cachedSArray[rot] = finalImage;
                 break;
-            case DataManager::PieceData::PieceType::L:
+            case PieceData::PieceType::L:
                 delete _cachedLArray[rot];
                 _cachedLArray[rot] = finalImage;
                 break;
-            case DataManager::PieceData::PieceType::I:
+            case PieceData::PieceType::I:
                 delete _cachedIArray[rot];
                 _cachedIArray[rot] = finalImage;
                 break;

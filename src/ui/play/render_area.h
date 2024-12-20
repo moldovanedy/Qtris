@@ -10,7 +10,7 @@
 #include "../../data_manager/runtime_data.h"
 #include "piece_manager.h"
 
-namespace UI
+namespace UI::Play
 {
     class RenderArea : public QWidget
     {

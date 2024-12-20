@@ -19,29 +19,29 @@ GameManager::CoreRuntime *GameManager::CoreRuntime::getInstance() {
 }
 
 void GameManager::CoreRuntime::onUpdate() {
-    if (this->_lineClearAnimationStepsLeft > 0) {
+    if (_lineClearAnimationStepsLeft > 0) {
         if ((MainLoop::getInstance()->getFrameCounter() % 4) != 0) {
             return;
         }
 
         for (int i = 0; i < 4; i++) {
             GameManager::PlayField::getInstance()->setSquareType(
-                this->_rowsToClear[i],
-                this->_lineClearAnimationStepsLeft,
+                _rowsToClear[i],
+                _lineClearAnimationStepsLeft,
                 0);
             GameManager::PlayField::getInstance()->setSquareType(
-                this->_rowsToClear[i],
-                10 - this->_lineClearAnimationStepsLeft,
+                _rowsToClear[i],
+                10 - _lineClearAnimationStepsLeft,
                 0);
         }
 
-        this->_lineClearAnimationStepsLeft--;
+        _lineClearAnimationStepsLeft--;
     }
     //if there are no more animation frames but it still is in the animation it means it needs to update the score data.
-    else if (this->_isInLineClearAnimation) {
+    else if (_isInLineClearAnimation) {
         int linesCleared = 0;
         for (int i = 0; i < 4; i++) {
-            if (this->_rowsToClear[i] != 0) {
+            if (_rowsToClear[i] != 0) {
                 linesCleared++;
             }
         }
@@ -50,7 +50,7 @@ void GameManager::CoreRuntime::onUpdate() {
         for (int row = 19; row >= 0; row--) {
             bool isClear = false;
             for (int i = 0; i < 4; i++) {
-                if (this->_rowsToClear[i] == row) {
+                if (_rowsToClear[i] == row) {
                     linesToGoDown++;
                     isClear = true;
                     break;
@@ -68,17 +68,17 @@ void GameManager::CoreRuntime::onUpdate() {
         }
 
         DataManager::RuntimeData::addClearedLines(linesCleared);
-        this->_isInLineClearAnimation = false;
+        _isInLineClearAnimation = false;
     }
 }
 
 void GameManager::CoreRuntime::checkForLineClears() {
     GameManager::PlayField *field = GameManager::PlayField::getInstance();
     int linesCleared = 0;
-    this->_rowsToClear[0] = 0;
-    this->_rowsToClear[1] = 0;
-    this->_rowsToClear[2] = 0;
-    this->_rowsToClear[3] = 0;
+    _rowsToClear[0] = 0;
+    _rowsToClear[1] = 0;
+    _rowsToClear[2] = 0;
+    _rowsToClear[3] = 0;
 
     //get the lines to clear data
     for (int row = 19; row >= 0; row--) {
@@ -102,8 +102,8 @@ void GameManager::CoreRuntime::checkForLineClears() {
         GameManager::CurrentPiece::getInstance()->setLineClearDelay(
             (MainLoop::getInstance()->getFrameCounter() % 4) + 17);
 
-        this->_lineClearAnimationStepsLeft = 5;
-        this->_isInLineClearAnimation = true;
+        _lineClearAnimationStepsLeft = 5;
+        _isInLineClearAnimation = true;
     }
 
 }

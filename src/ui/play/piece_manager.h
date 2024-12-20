@@ -4,7 +4,7 @@
 #include <QImage>
 #include "../../data_manager/piece_data.h"
 
-namespace UI::Resources
+namespace UI::Play::Resources
 {
     /**
      * Returns the image for the specified type and the specified rotation (0 = 0deg, 1 = 90deg etc.).

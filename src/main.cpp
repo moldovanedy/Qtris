@@ -12,8 +12,8 @@ int main(int argc, char *argv[])
     srand(time(NULL));
     QApplication app(argc, argv);
 
-    UI::MainView view;
-    view.show();
+    UI::MainWindow wnd;
+    wnd.show();
 
     //initialization
     GameManager::CoreRuntime::getInstance();

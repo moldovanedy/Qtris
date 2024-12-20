@@ -10,7 +10,7 @@
 
 #include <string>
 
-#include "main_view.h"
+#include "../main_window.h"
 #include "render_area.h"
 #include "next_piece_view.h"
 #include "statistics_view.h"
@@ -18,7 +18,7 @@
 #include "../../game_manager/current_piece.h"
 #include "../../data_manager/runtime_data.h"
 
-namespace UI
+namespace UI::Play
 {
     class PlayArea : public QWidget
     {
@@ -27,8 +27,6 @@ namespace UI
     public:
         explicit PlayArea(QWidget *parent = nullptr);
         ~PlayArea();
-
-        static QFont getDataPixelFont();
 
         void setScore(int score);
         void setLineCount(int lines);
@@ -40,8 +38,6 @@ namespace UI
         void keyReleaseEvent(QKeyEvent *e) override;
 
     private:
-        static QFont _pixelFont;
-
         void onDataChanged();
 
         void createLeftBar(QBoxLayout *columnBox);

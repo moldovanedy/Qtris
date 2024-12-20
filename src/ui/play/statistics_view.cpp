@@ -1,6 +1,10 @@
 #include "statistics_view.h"
 
-UI::StatisticsView::StatisticsView(QWidget *parent) : QWidget(parent)
+using namespace UI::Play;
+using namespace GameManager;
+using namespace DataManager;
+
+StatisticsView::StatisticsView(QWidget *parent) : QWidget(parent)
 {
     this->setAttribute(Qt::WA_StyledBackground, true);
     this->setStyleSheet(QTRIS_DATA_AREA_STYLE);
@@ -12,7 +16,7 @@ UI::StatisticsView::StatisticsView(QWidget *parent) : QWidget(parent)
 
     QLabel *title = new QLabel(this);
     title->setStyleSheet("border: none");
-    title->setFont(PlayArea::getDataPixelFont());
+    title->setFont(MainWindow::getInstance()->getAppFont());
     title->setText("STATISTICS");
     title->setContentsMargins(0, 0, 0, 0);
     title->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Maximum);
@@ -21,40 +25,15 @@ UI::StatisticsView::StatisticsView(QWidget *parent) : QWidget(parent)
     mainColumn->addWidget(title);
 
     for (int i = 0; i < 7; i++) {
-        DataManager::PieceData::PieceType pieceType = (DataManager::PieceData::PieceType)i;
-        // switch (i)
-        // {
-        // default:
-        // case 0:
-        //     pieceType = DataManager::PieceData::PieceType::T;
-        //     break;
-        // case 1:
-        //     pieceType = DataManager::PieceData::PieceType::J;
-        //     break;
-        // case 2:
-        //     pieceType = DataManager::PieceData::PieceType::Z;
-        //     break;
-        // case 3:
-        //     pieceType = DataManager::PieceData::PieceType::O;
-        //     break;
-        // case 4:
-        //     pieceType = DataManager::PieceData::PieceType::S;
-        //     break;
-        // case 5:
-        //     pieceType = DataManager::PieceData::PieceType::L;
-        //     break;
-        // case 6:
-        //     pieceType = DataManager::PieceData::PieceType::I;
-        //     break;
-        // }
+        PieceData::PieceType pieceType = (PieceData::PieceType)i;
 
         QBoxLayout *row = new QBoxLayout(QBoxLayout::Direction::LeftToRight);
         row->setAlignment(Qt::AlignCenter);
 
         QPoint spawnPoint = QPoint();
-        QImage *piece = UI::Resources::getPieceImage(pieceType, -1, spawnPoint);
+        QImage *piece = Resources::getPieceImage(pieceType, -1, spawnPoint);
         QImage scaledPiece;
-        if (pieceType == DataManager::PieceData::PieceType::I) {
+        if (pieceType == PieceData::PieceType::I) {
             scaledPiece = piece->scaled(QSize(16, 16), Qt::AspectRatioMode::KeepAspectRatioByExpanding);
         }
         else {
@@ -67,53 +46,53 @@ UI::StatisticsView::StatisticsView(QWidget *parent) : QWidget(parent)
         imageView->setAlignment(Qt::AlignCenter);
         imageView->setContentsMargins(0, 0, 0, 0);
         imageView->setPixmap(QPixmap::fromImage(scaledPiece));
-        this->_images->insert(std::make_pair(pieceType, imageView));
+        _images->insert(std::make_pair(pieceType, imageView));
 
         row->addWidget(imageView);
 
         QLabel *statLabel = new QLabel(this);
         statLabel->setText("000");
         statLabel->setContentsMargins(0, 0, 0, 0);
-        statLabel->setFont(PlayArea::getDataPixelFont());
+        statLabel->setFont(MainWindow::getInstance()->getAppFont());
         statLabel->setStyleSheet("border: none");
 
         row->addWidget(statLabel);
-        this->_labels->insert(std::make_pair(pieceType, statLabel));
+        _labels->insert(std::make_pair(pieceType, statLabel));
 
         mainColumn->addLayout(row);
     }
 
 
-    GameManager::CurrentPiece::getInstance()->addPieceLockedEventHandler(
-        std::bind(&UI::StatisticsView::onPieceLocked, this));
-    GameManager::MainLoop::getInstance()->addUpdateEventListener(
-        std::bind(&UI::StatisticsView::onUpdate, this));
-    DataManager::RuntimeData::addDataChangedCallback(
-        std::bind(&UI::StatisticsView::redrawPieces, this));
+    CurrentPiece::getInstance()->addPieceLockedEventHandler(
+        std::bind(&StatisticsView::onPieceLocked, this));
+    MainLoop::getInstance()->addUpdateEventListener(
+        std::bind(&StatisticsView::onUpdate, this));
+    RuntimeData::addDataChangedCallback(
+        std::bind(&StatisticsView::redrawPieces, this));
 }
 
-UI::StatisticsView::~StatisticsView() {}
+StatisticsView::~StatisticsView() {}
 
-void UI::StatisticsView::redrawPieces() {
-    if (DataManager::RuntimeData::getLevel() == this->_lastLevel) {
+void StatisticsView::redrawPieces() {
+    if (RuntimeData::getLevel() == _lastLevel) {
         return;
     }
-    this->_lastLevel = DataManager::RuntimeData::getLevel();
-    this->_needsRepaint = true;
+    _lastLevel = RuntimeData::getLevel();
+    _needsRepaint = true;
 }
 
-void UI::StatisticsView::onUpdate() {
-    if (!this->_needsRepaint) {
+void StatisticsView::onUpdate() {
+    if (!_needsRepaint) {
         return;
     }
 
     for (int i = 0; i < 7; i++) {
-        DataManager::PieceData::PieceType pieceType = (DataManager::PieceData::PieceType)i;
+        PieceData::PieceType pieceType = (PieceData::PieceType)i;
 
         QPoint spawnPoint = QPoint();
-        QImage *piece = UI::Resources::getPieceImage(pieceType, -1, spawnPoint);
+        QImage *piece = Resources::getPieceImage(pieceType, -1, spawnPoint);
         QImage scaledPiece;
-        if (pieceType == DataManager::PieceData::PieceType::I) {
+        if (pieceType == PieceData::PieceType::I) {
             scaledPiece = piece->scaled(QSize(16, 16), Qt::AspectRatioMode::KeepAspectRatioByExpanding);
         }
         else {
@@ -121,12 +100,12 @@ void UI::StatisticsView::onUpdate() {
         }
         //delete piece;
 
-        this->_images->at(pieceType)->setPixmap(QPixmap::fromImage(scaledPiece));
+        _images->at(pieceType)->setPixmap(QPixmap::fromImage(scaledPiece));
     }
-    this->_needsRepaint = false;
+    _needsRepaint = false;
 }
 
-void UI::StatisticsView::incrementPieceNumber(DataManager::PieceData::PieceType pieceType) {
+void StatisticsView::incrementPieceNumber(PieceData::PieceType pieceType) {
     int pieceNumber = getPieceNumber(pieceType);
     pieceNumber++;
 
@@ -137,21 +116,21 @@ void UI::StatisticsView::incrementPieceNumber(DataManager::PieceData::PieceType 
         n /= 10;
     }
 
-    this->_labels->at(pieceType)->setText(
+    _labels->at(pieceType)->setText(
         QString::fromStdString(
             std::to_string(pieceNumber)
             .insert(0, leadingZeroes, '0')));
 }
 
-int UI::StatisticsView::getPieceNumber(DataManager::PieceData::PieceType pieceType) {
-    QString previousString = this->_labels->at(pieceType)->text();
+int StatisticsView::getPieceNumber(PieceData::PieceType pieceType) {
+    QString previousString = _labels->at(pieceType)->text();
     return std::stoi(previousString.toStdString());
 }
 
-void UI::StatisticsView::onPieceLocked() {
-    DataManager::PieceData::PieceType pieceType;
+void StatisticsView::onPieceLocked() {
+    PieceData::PieceType pieceType;
     int rotation = 0;
 
-    GameManager::CurrentPiece::getInstance()->getNextPieceData(pieceType, rotation);
+    CurrentPiece::getInstance()->getNextPieceData(pieceType, rotation);
     this->incrementPieceNumber(pieceType);
 }

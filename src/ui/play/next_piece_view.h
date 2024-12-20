@@ -6,7 +6,7 @@
 #include "main_view.h"
 #include "play_area.h"
 
-namespace UI
+namespace UI::Play
 {
     class NextPieceView : public QWidget
     {

@@ -1,29 +1,33 @@
 #include "render_area.h"
 
-UI::RenderArea::RenderArea(QWidget *parent) : QWidget(parent)
+using namespace UI::Play;
+using namespace GameManager;
+using namespace DataManager;
+
+RenderArea::RenderArea(QWidget *parent) : QWidget(parent)
 {
-    //this->_lastExpandedLayout = new unsigned char[200] {0};
+    //_lastExpandedLayout = new unsigned char[200] {0};
     this->setContentsMargins(0, 0, 0, 0);
 
-    GameManager::MainLoop::getInstance()->addUpdateEventListener(std::bind(&UI::RenderArea::redraw, this));
-    DataManager::RuntimeData::addDataChangedCallback(std::bind(&UI::RenderArea::checkForPieceColorChange, this));
+    MainLoop::getInstance()->addUpdateEventListener(std::bind(&RenderArea::redraw, this));
+    RuntimeData::addDataChangedCallback(std::bind(&RenderArea::checkForPieceColorChange, this));
 }
 
-UI::RenderArea::~RenderArea() {
-    //delete[] this->_lastExpandedLayout;
+RenderArea::~RenderArea() {
+    //delete[] _lastExpandedLayout;
 }
 
-void UI::RenderArea::redraw()
+void RenderArea::redraw()
 {
     this->update();
 }
 
-void UI::RenderArea::checkForPieceColorChange() {
+void RenderArea::checkForPieceColorChange() {
     //set the colors (will check if the level has changed or not)
-    UI::Resources::setColorsForLevel(DataManager::RuntimeData::getLevel());
+    Resources::setColorsForLevel(RuntimeData::getLevel());
 }
 
-void UI::RenderArea::paintEvent(QPaintEvent *e)
+void RenderArea::paintEvent(QPaintEvent *e)
 {
     QRect renderArea = QRect(10, 20, this->width() - 20, this->height() - 40);
     QPainter painter(this);
@@ -38,22 +42,23 @@ void UI::RenderArea::paintEvent(QPaintEvent *e)
     painter.drawRect(renderArea);
 
     this->paintBlocks(&painter, renderArea);
+    ((QWidget *)this->parent())->setFocus();
 }
 
-void UI::RenderArea::paintBlocks(QPainter *painter, QRect renderArea) {
+void RenderArea::paintBlocks(QPainter *painter, QRect renderArea) {
     float blockSize = renderArea.width() / 10.0;
 
     QImage typeOneImage, typeTwoImage, typeThreeImage;
 
     for (int row = 0; row < GameManager::NUMBER_OF_ROWS; row++) {
         for (int column = 0; column < GameManager::NUMBER_OF_COLUMNS; column++) {
-            int blockType = GameManager::PlayField::getInstance()->getSquareType(row, column);
+            int blockType = PlayField::getInstance()->getSquareType(row, column);
             assert((blockType >= 0 && blockType <= 3) && "ERROR: block type is invalid");
 
-            // if (blockType == this->_lastExpandedLayout[row * GameManager::NUMBER_OF_COLUMNS + column]) {
+            // if (blockType == _lastExpandedLayout[row * GameManager::NUMBER_OF_COLUMNS + column]) {
             //     continue;
             // }
-            // this->_lastExpandedLayout[row * GameManager::NUMBER_OF_COLUMNS + column] = blockType;
+            // _lastExpandedLayout[row * GameManager::NUMBER_OF_COLUMNS + column] = blockType;
 
             QImage imageToDraw;
             switch (blockType) {
@@ -64,7 +69,7 @@ void UI::RenderArea::paintBlocks(QPainter *painter, QRect renderArea) {
             case 1:
                 //TODO: we need to check if we need to regenerate the images somehow here
                 if (typeOneImage.isNull()) {
-                    QImage image = QImage(*(UI::Resources::getTypeOneBlock()));
+                    QImage image = QImage(*(Resources::getTypeOneBlock()));
                     typeOneImage = image.scaled(QSize(blockSize, blockSize));
                 }
 
@@ -72,7 +77,7 @@ void UI::RenderArea::paintBlocks(QPainter *painter, QRect renderArea) {
                 break;
             case 2:
                 if (typeTwoImage.isNull()) {
-                    QImage image = QImage(*(UI::Resources::getTypeTwoBlock()));
+                    QImage image = QImage(*(Resources::getTypeTwoBlock()));
                     typeTwoImage = image.scaled(QSize(blockSize, blockSize));
                 }
 
@@ -80,7 +85,7 @@ void UI::RenderArea::paintBlocks(QPainter *painter, QRect renderArea) {
                 break;
             case 3:
                 if (typeThreeImage.isNull()) {
-                    QImage image = QImage(*(UI::Resources::getTypeThreeBlock()));
+                    QImage image = QImage(*(Resources::getTypeThreeBlock()));
                     typeThreeImage = image.scaled(QSize(blockSize, blockSize));
                 }
 

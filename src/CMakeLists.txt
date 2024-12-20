@@ -12,13 +12,17 @@ qt_standard_project_setup()
 
 qt_add_executable(Qtris 
     main.cpp
+    ui/main_window.cpp
+    ui/menu_bar.cpp
+
     ui/play/main_view.cpp
-    ui/play/menu_bar.cpp
     ui/play/play_area.cpp
     ui/play/render_area.cpp
     ui/play/next_piece_view.cpp
     ui/play/statistics_view.cpp
     ui/play/piece_manager.cpp
+
+    ui/menus/select_level.cpp
     
     game_manager/play_field.cpp
     game_manager/main_loop.cpp
