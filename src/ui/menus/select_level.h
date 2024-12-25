@@ -25,7 +25,8 @@ namespace UI::Menus {
         QPushButton *_buttons[20];
 
         QBoxLayout *getMainContent();
-        void visuallySelectLevel();
+        void visuallyActivateLevel();
+        void selectLevel();
     };
 }
 #endif

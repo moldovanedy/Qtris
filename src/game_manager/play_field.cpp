@@ -1,22 +1,28 @@
 #include "play_field.h"
 
-GameManager::PlayField::PlayField() {
+using namespace GameManager;
+
+PlayField *PlayField::_instance = nullptr;
+
+PlayField::PlayField() {
     // for (int i = 0; i < 50; i++) {
     //     _playField[i] = 0b01010101;
     // }
 }
 
-GameManager::PlayField *GameManager::PlayField::_instance = nullptr;
-
-GameManager::PlayField *GameManager::PlayField::getInstance() {
-    if (GameManager::PlayField::_instance == nullptr) {
-        GameManager::PlayField::_instance = new GameManager::PlayField();
-    }
-
-    return GameManager::PlayField::_instance;
+PlayField::~PlayField() {
+    _instance = nullptr;
 }
 
-bool GameManager::PlayField::isSquareFree(int row, int column) {
+PlayField *PlayField::getInstance() {
+    if (PlayField::_instance == nullptr) {
+        PlayField::_instance = new PlayField();
+    }
+
+    return PlayField::_instance;
+}
+
+bool PlayField::isSquareFree(int row, int column) {
     if (row < 0 || column < 0 || row >= NUMBER_OF_ROWS || column >= NUMBER_OF_COLUMNS) {
         return true;
     }
@@ -28,7 +34,7 @@ bool GameManager::PlayField::isSquareFree(int row, int column) {
     return (_playField[indexOfByte] & (0b11 << indexInByte)) == 0;
 }
 
-int GameManager::PlayField::getSquareType(int row, int column) {
+int PlayField::getSquareType(int row, int column) {
     if (row < 0 || column < 0 || row >= NUMBER_OF_ROWS || column >= NUMBER_OF_COLUMNS) {
         return 0;
     }
@@ -43,7 +49,7 @@ int GameManager::PlayField::getSquareType(int row, int column) {
     return (lsb != 0) | ((msb != 0) << 1);
 }
 
-void GameManager::PlayField::setSquareType(int row, int column, int squareType) {
+void PlayField::setSquareType(int row, int column, int squareType) {
     if (row < 0 || column < 0 || row >= NUMBER_OF_ROWS || column >= NUMBER_OF_COLUMNS) {
         return;
     }

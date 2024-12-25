@@ -123,6 +123,14 @@ unsigned char Resources::getColorFourFromPallette() {
     return _currentPalette;
 }
 
+QColor Resources::getColorFromNesPalette(unsigned char index) {
+    if (index >= 64) {
+        return QColor(QRgb(0x000000));
+    }
+
+    return QColor(_nesPallette[index]);
+}
+
 static void setColorOneFromPallette(unsigned char palletteValue) {
     if (palletteValue >= 0x40) {
         throw std::invalid_argument("Invalid pallette index at Resources::setColorOneFromPallette");

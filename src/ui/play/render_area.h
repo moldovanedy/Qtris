@@ -8,6 +8,7 @@
 #include "../../game_manager/play_field.h"
 #include "../../game_manager/main_loop.h"
 #include "../../data_manager/runtime_data.h"
+#include "../../game_manager/current_piece.h"
 #include "piece_manager.h"
 
 namespace UI::Play
@@ -29,8 +30,12 @@ namespace UI::Play
     private:
         QString _currentFile;
         unsigned char *_lastExpandedLayout;
+        bool _isGameOver = false;
 
         void paintBlocks(QPainter *painter, QRect renderArea);
+        void drawGameOverCurtain(QPainter *painter, QRect renderArea);
+
+        void onGameOver();
     };
 }
 

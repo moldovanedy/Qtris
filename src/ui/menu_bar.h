@@ -14,10 +14,8 @@ namespace UI {
 
         QAction *getGameNewAction();
         QAction *getGameHighScoresAction();
-        QAction *getGameSettingsAction();
         QAction *getGameQuitAction();
 
-        QAction *getHelpHowToPlayAction();
         QAction *getHelpAboutAction();
 
     private:

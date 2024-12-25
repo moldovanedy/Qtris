@@ -10,7 +10,7 @@ namespace GameManager {
     class PlayField {
     public:
         PlayField(PlayField &other) = delete;
-        ~PlayField() {}
+        ~PlayField();
         static PlayField *getInstance();
 
         bool isSquareFree(int row, int column);

@@ -181,7 +181,7 @@ void PlayArea::createRightBar(QBoxLayout *column) {
     column->addSpacing(35);
 
     _levelLabel = new QLabel(this);
-    this->setLevelNumber(0);
+    this->setLevelNumber(DataManager::RuntimeData::getLevel());
     _levelLabel->setContentsMargins(0, 0, 0, 0);
     _levelLabel->setFont(MainWindow::getInstance()->getAppFont());
     _levelLabel->setAlignment(Qt::AlignCenter);

@@ -23,6 +23,7 @@ qt_add_executable(Qtris
     ui/play/piece_manager.cpp
 
     ui/menus/select_level.cpp
+    ui/menus/high_scores.cpp
     
     game_manager/play_field.cpp
     game_manager/main_loop.cpp

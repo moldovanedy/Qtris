@@ -83,9 +83,15 @@ namespace GameManager {
         void addPieceLockedEventHandler(std::function<void()> callback);
         bool removePieceLockedEventHandler(std::function<void()> callback);
 
+        /**
+         * Will call the given eventListener (callback) when the it's game over.
+         */
+        void addGameOverEventHandler(std::function<void()> callback);
+        bool removeGameOverEventHandler(std::function<void()> callback);
+
     private:
         CurrentPiece();
-        ~CurrentPiece() {};
+        ~CurrentPiece();
         static CurrentPiece *_instance;
 
         /**
@@ -124,6 +130,7 @@ namespace GameManager {
         Utils::Event *_pieceLockedEvent;
         std::function<void()> _updateCallback;
         void onUpdate();
+        Utils::Event *_gameOverEvent;
 
         int _rowPosition = 0;
         int _columnPosition = 5;
@@ -143,6 +150,8 @@ namespace GameManager {
         //(intended behavior because holding for soft drop after the piece has been locked and ARE is done should NOT use soft drop)
         int _softDropFrame = -1;
         bool _isSoftDropKeyDown = false;
+        //the number of frames the piece is soft-dropped (resets when the key is released)
+        unsigned int _softDropCount = 0;
 
         int _dasFrame = 0;
         bool _isMoveLeftKeyDown = false;

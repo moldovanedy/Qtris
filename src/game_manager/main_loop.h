@@ -13,6 +13,7 @@ namespace GameManager {
 
     public:
         MainLoop(MainLoop &other) = delete;
+        ~MainLoop();
         static MainLoop *getInstance();
 
         void addUpdateEventListener(std::function<void()> callback);

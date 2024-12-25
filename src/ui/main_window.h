@@ -12,6 +12,7 @@
 
 #include "play/play_area.h"
 #include "menus/select_level.h"
+#include "menus/high_scores.h"
 
 #include "menu_bar.h"
 #include "../game_manager/main_loop.h"

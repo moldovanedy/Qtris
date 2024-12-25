@@ -2,6 +2,7 @@
 
 unsigned int _level = 0, _score = 0, _clearedLines = 0;
 int _linesToNextLevel = 10;
+bool _isLongLevel = false;
 Utils::Event *_dataChangedEvent = new Utils::Event();
 
 unsigned int DataManager::RuntimeData::getLevel() {
@@ -73,12 +74,26 @@ void DataManager::RuntimeData::addClearedLines(unsigned int lines) {
         lines = 4;
     }
 
+    //truncate the 1, 2 or 3 resulted form more than 1 line cleared
+    unsigned int normalizedClrLines = _clearedLines / 10 * 10;
+
+    //NES IMPLEMENTATION: after 2290 lines (when starting form level 19), the line count to the next level goes to 800 lines
+    //because of a bug, then it happens at intervals of 2900 lines
+    //TODO: implement correct behavior depending on the start level (it's unclear how, but at least for level 0 it happens at 2190 lines)
+    _clearedLines += lines;
+    if (!_isLongLevel && _clearedLines >= 2290 && (normalizedClrLines - 2290) % 2900 == 0) {
+        _isLongLevel = true;
+    }
+    else if (_isLongLevel && _linesToNextLevel - lines <= 0) {
+        _isLongLevel = false;
+    }
+
     //NES IMPLEMENTATION: the score will take the level that will be after these lines are cleared, 
     //so we increment the level before the calculation to mimic that behavior
     _linesToNextLevel -= lines;
     if (_linesToNextLevel <= 0) {
         _level++;
-        _linesToNextLevel += 10;
+        _linesToNextLevel += _isLongLevel ? 810 : 10;
     }
 
     switch (lines) {
@@ -99,7 +114,6 @@ void DataManager::RuntimeData::addClearedLines(unsigned int lines) {
         break;
     }
 
-    _clearedLines += lines;
     _dataChangedEvent->invoke();
 }
 
@@ -110,6 +124,25 @@ void DataManager::RuntimeData::addSoftDropScore(unsigned int score) {
 
     _score += score;
     _dataChangedEvent->invoke();
+}
+
+void DataManager::RuntimeData::setStartLevel(unsigned int level) {
+    if (level > __INT32_MAX__) {
+        level = 0;
+    }
+    _level = std::min((int)level, 19);
+
+    //NES IMPLEMENTATION: lines to the next level does not progress by increments of 10 as intended because of a bug in logic
+    //therefore, implement the actual values here
+    if (_level < 10) {
+        _linesToNextLevel = (_level + 1) * 10;
+    }
+    else if (_level < 16) {
+        _linesToNextLevel = 100;
+    }
+    else {
+        _linesToNextLevel = (_level - 5) * 10;
+    }
 }
 
 void DataManager::RuntimeData::addDataChangedCallback(std::function<void()> callback) {

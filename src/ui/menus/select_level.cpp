@@ -36,7 +36,7 @@ SelectLevel::SelectLevel(QWidget *parent) : QWidget(parent) {
         verticalBoxContainer->addWidget(bottomSpacer, 1);
     }
 
-    this->visuallySelectLevel();
+    this->visuallyActivateLevel();
 }
 
 SelectLevel::~SelectLevel() {}
@@ -48,7 +48,7 @@ void SelectLevel::keyPressEvent(QKeyEvent *e) {
             return;
         }
 
-        MainWindow::getInstance()->setCurrentScene(Scene::PlayScreen);
+        this->selectLevel();
     }
 
     _lastSelectedLevel = _selectedLevel;
@@ -99,21 +99,27 @@ void SelectLevel::keyPressEvent(QKeyEvent *e) {
         return;
     }
 
-    this->visuallySelectLevel();
+    this->visuallyActivateLevel();
 }
 
-void SelectLevel::visuallySelectLevel() {
+void SelectLevel::visuallyActivateLevel() {
     _buttons[_lastSelectedLevel]->setStyleSheet("background-color: #000; border: 2px solid #fff; font-size: 24px;");
     _buttons[_selectedLevel]->setStyleSheet("background-color: #ff9800; border: 2px solid #fff; font-size: 24px;");
+}
+
+void SelectLevel::selectLevel() {
+    DataManager::RuntimeData::setStartLevel(_selectedLevel);
+    MainWindow::getInstance()->setCurrentScene(Scene::PlayScreen);
 }
 
 QBoxLayout *SelectLevel::getMainContent() {
     QBoxLayout *root = new QBoxLayout(QBoxLayout::Direction::TopToBottom);
 
-    QLabel *label = new QLabel("Select level");
-    label->setStyleSheet("font-size: 32px;");
-    label->setFont(MainWindow::getInstance()->getAppFont());
-    root->addWidget(label);
+    QLabel *title = new QLabel("Select level");
+    title->setAlignment(Qt::AlignCenter);
+    title->setStyleSheet("font-size: 32px;");
+    title->setFont(MainWindow::getInstance()->getAppFont());
+    root->addWidget(title);
 
     root->addSpacing(30);
 
@@ -133,6 +139,31 @@ QBoxLayout *SelectLevel::getMainContent() {
         _buttons[i] = levelButton;
     }
     root->addLayout(levelGrid);
+    root->addSpacing(25);
+
+    QLabel *leftKeyExplanation = new QLabel("Left arrow: move the piece to the left");
+    leftKeyExplanation->setFont(MainWindow::getInstance()->getAppFont());
+    root->addWidget(leftKeyExplanation);
+    root->addSpacing(10);
+
+    QLabel *rightKeyExplanation = new QLabel("Right arrow: move the piece to the right");
+    rightKeyExplanation->setFont(MainWindow::getInstance()->getAppFont());
+    root->addWidget(rightKeyExplanation);
+    root->addSpacing(10);
+
+    QLabel *downKeyExplanation = new QLabel("Down arrow: drop the piece (soft-drop)");
+    downKeyExplanation->setFont(MainWindow::getInstance()->getAppFont());
+    root->addWidget(downKeyExplanation);
+    root->addSpacing(10);
+
+    QLabel *zKeyExplanation = new QLabel("Z key: rotate the piece clockwise");
+    zKeyExplanation->setFont(MainWindow::getInstance()->getAppFont());
+    root->addWidget(zKeyExplanation);
+    root->addSpacing(10);
+
+    QLabel *xKeyExplanation = new QLabel("X key: rotate the piece counter-clockwise");
+    xKeyExplanation->setFont(MainWindow::getInstance()->getAppFont());
+    root->addWidget(xKeyExplanation);
 
     return root;
 }

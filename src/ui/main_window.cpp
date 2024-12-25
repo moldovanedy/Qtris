@@ -46,7 +46,7 @@ QStackedWidget *MainWindow::getStackPanel()
     _pauseScreen = new QLabel("PAUSED");
     _pauseScreen->setFont(this->getAppFont());
     _pauseScreen->setAlignment(Qt::AlignCenter);
-    _pauseScreen->setStyleSheet("font-size: 45px; background-color: #000; background-image: url();");
+    _pauseScreen->setStyleSheet("font-size: 48px; background-color: #000; background-image: url();");
     _pauseScreen->setVisible(false);
     _mainStackPanel->addWidget(_pauseScreen);
 
@@ -87,6 +87,8 @@ void MainWindow::setCurrentScene(Scene scene) {
     case Scene::SelectLevel:
         _mainContent = new Menus::SelectLevel(this);
         break;
+    case Scene::HighScores:
+        _mainContent = new Menus::HighScores(this);
     default:
         break;
     }

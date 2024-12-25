@@ -4,21 +4,23 @@ using namespace UI::Play;
 using namespace GameManager;
 using namespace DataManager;
 
-RenderArea::RenderArea(QWidget *parent) : QWidget(parent)
-{
+RenderArea::RenderArea(QWidget *parent) : QWidget(parent) {
     //_lastExpandedLayout = new unsigned char[200] {0};
     this->setContentsMargins(0, 0, 0, 0);
 
     MainLoop::getInstance()->addUpdateEventListener(std::bind(&RenderArea::redraw, this));
+    CurrentPiece::getInstance()->addGameOverEventHandler(std::bind(&RenderArea::onGameOver, this));
     RuntimeData::addDataChangedCallback(std::bind(&RenderArea::checkForPieceColorChange, this));
+
+    //change the colors of the pieces (because we might start from a level different than 0)
+    this->checkForPieceColorChange();
 }
 
 RenderArea::~RenderArea() {
     //delete[] _lastExpandedLayout;
 }
 
-void RenderArea::redraw()
-{
+void RenderArea::redraw() {
     this->update();
 }
 
@@ -27,14 +29,13 @@ void RenderArea::checkForPieceColorChange() {
     Resources::setColorsForLevel(RuntimeData::getLevel());
 }
 
-void RenderArea::paintEvent(QPaintEvent *e)
-{
+void RenderArea::paintEvent(QPaintEvent *e) {
     QRect renderArea = QRect(10, 20, this->width() - 20, this->height() - 40);
     QPainter painter(this);
 
     painter.setPen(Qt::PenStyle::SolidLine);
     //border
-    painter.setBrush(QBrush(QColor(0x00, 0xff, 0xff)));
+    painter.setBrush(QBrush(QColor(0x4f, 0xc3, 0xf7)));
     painter.drawRect(QRect(0, 0, this->width(), this->height()));
 
     //clear area
@@ -42,7 +43,12 @@ void RenderArea::paintEvent(QPaintEvent *e)
     painter.drawRect(renderArea);
 
     this->paintBlocks(&painter, renderArea);
-    ((QWidget *)this->parent())->setFocus();
+    if (_isGameOver) {
+        this->drawGameOverCurtain(&painter, renderArea);
+    }
+    else {
+        ((QWidget *)this->parent())->setFocus();
+    }
 }
 
 void RenderArea::paintBlocks(QPainter *painter, QRect renderArea) {
@@ -55,11 +61,6 @@ void RenderArea::paintBlocks(QPainter *painter, QRect renderArea) {
             int blockType = PlayField::getInstance()->getSquareType(row, column);
             assert((blockType >= 0 && blockType <= 3) && "ERROR: block type is invalid");
 
-            // if (blockType == _lastExpandedLayout[row * GameManager::NUMBER_OF_COLUMNS + column]) {
-            //     continue;
-            // }
-            // _lastExpandedLayout[row * GameManager::NUMBER_OF_COLUMNS + column] = blockType;
-
             QImage imageToDraw;
             switch (blockType) {
             default:
@@ -67,7 +68,6 @@ void RenderArea::paintBlocks(QPainter *painter, QRect renderArea) {
                 imageToDraw = QImage();
                 break;
             case 1:
-                //TODO: we need to check if we need to regenerate the images somehow here
                 if (typeOneImage.isNull()) {
                     QImage image = QImage(*(Resources::getTypeOneBlock()));
                     typeOneImage = image.scaled(QSize(blockSize, blockSize));
@@ -97,4 +97,50 @@ void RenderArea::paintBlocks(QPainter *painter, QRect renderArea) {
             painter->drawImage(drawPoint, imageToDraw);
         }
     }
+}
+
+unsigned int _gameOverCurtainFrame = -16;
+unsigned int _gameOverCurtainRow = 0;
+
+void RenderArea::drawGameOverCurtain(QPainter *painter, QRect renderArea) {
+    float rowHeight = renderArea.height() / 20;
+
+    if (_gameOverCurtainFrame < 4) {
+        _gameOverCurtainFrame++;
+    }
+    else {
+        _gameOverCurtainFrame = 0;
+
+        if (_gameOverCurtainRow < 20) {
+            _gameOverCurtainRow++;
+        }
+    }
+
+    painter->setPen(Qt::PenStyle::SolidLine);
+    for (int i = 0; i < _gameOverCurtainRow; i++) {
+        painter->setBrush(QBrush(Resources::getColorFromNesPalette(Resources::getColorTwoFromPallette())));
+        painter->drawRect(QRect(
+            renderArea.x(),
+            renderArea.y() + (i * rowHeight),
+            renderArea.width(),
+            rowHeight * 0.33));
+
+        painter->setBrush(QBrush(Resources::getColorFromNesPalette(Resources::getColorThreeFromPallette())));
+        painter->drawRect(QRect(
+            renderArea.x(),
+            renderArea.y() + (i * rowHeight) + (rowHeight * 0.33),
+            renderArea.width(),
+            rowHeight * 0.33));
+
+        painter->setBrush(QBrush(Resources::getColorFromNesPalette(Resources::getColorFourFromPallette())));
+        painter->drawRect(QRect(
+            renderArea.x(),
+            renderArea.y() + (i * rowHeight) + (rowHeight * 0.66),
+            renderArea.width(),
+            rowHeight * 0.33));
+    }
+}
+
+void RenderArea::onGameOver() {
+    _isGameOver = true;
 }

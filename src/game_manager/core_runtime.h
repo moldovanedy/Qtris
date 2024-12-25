@@ -7,7 +7,7 @@ namespace GameManager {
     class CoreRuntime {
     public:
         CoreRuntime(CoreRuntime &other) = delete;
-        ~CoreRuntime() {};
+        ~CoreRuntime();
         static CoreRuntime *getInstance();
 
     private:

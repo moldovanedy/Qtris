@@ -1,15 +1,18 @@
 #include "current_piece.h"
 
-GameManager::CurrentPiece *GameManager::CurrentPiece::_instance = nullptr;
+using namespace GameManager;
 
-GameManager::CurrentPiece::CurrentPiece() {
+CurrentPiece *CurrentPiece::_instance = nullptr;
+
+CurrentPiece::CurrentPiece() {
     //this->reset();
     _pieceLockedEvent = new Utils::Event();
-    _updateCallback = std::bind(&GameManager::CurrentPiece::onUpdate, this);
+    _gameOverEvent = new Utils::Event();
+    _updateCallback = std::bind(&CurrentPiece::onUpdate, this);
     MainLoop::getInstance()->addUpdateEventListener(_updateCallback);
 }
 
-DataManager::PieceData::PieceType GameManager::CurrentPiece::generateNextPiece() {
+DataManager::PieceData::PieceType CurrentPiece::generateNextPiece() {
     int previousPiece = (int)_pieceType;
     int firstIteration = rand() % 8;
 
@@ -20,7 +23,16 @@ DataManager::PieceData::PieceType GameManager::CurrentPiece::generateNextPiece()
     return (PieceType)(rand() % 7);
 }
 
-GameManager::CurrentPiece *GameManager::CurrentPiece::getInstance() {
+CurrentPiece::~CurrentPiece() {
+    _instance = nullptr;
+
+    _pieceLockedEvent->clearAllListeners();
+    delete _pieceLockedEvent;
+    _gameOverEvent->clearAllListeners();
+    delete _gameOverEvent;
+}
+
+CurrentPiece *CurrentPiece::getInstance() {
     if (CurrentPiece::_instance == nullptr) {
         CurrentPiece::_instance = new CurrentPiece();
     }
@@ -28,7 +40,7 @@ GameManager::CurrentPiece *GameManager::CurrentPiece::getInstance() {
     return CurrentPiece::_instance;
 }
 
-void GameManager::CurrentPiece::onUpdate() {
+void CurrentPiece::onUpdate() {
     if (_areRemainingFrames > 0) {
         _areRemainingFrames--;
         return;
@@ -64,6 +76,7 @@ void GameManager::CurrentPiece::onUpdate() {
     if (_isSoftDropKeyDown) {
         if (_softDropFrame == 0) {
             this->performFall();
+            _softDropCount++;
             _softDropFrame = 1;
             return;
         }
@@ -71,6 +84,13 @@ void GameManager::CurrentPiece::onUpdate() {
             _softDropFrame--;
             return;
         }
+        //it is -1
+        else {
+            _softDropCount = 0;
+        }
+    }
+    else {
+        _softDropCount = 0;
     }
 
     //we DO need to use a separate fall frame counter to correctly implement ARE
@@ -81,24 +101,23 @@ void GameManager::CurrentPiece::onUpdate() {
     }
 }
 
-void GameManager::CurrentPiece::setLineClearDelay(int frameDelay) {
-    _isAreActive = false;
-    _areRemainingFrames = 0;
+void CurrentPiece::setLineClearDelay(int frameDelay) {
+    _areRemainingFrames += frameDelay;
 
     _lineClearRemainingFrames = frameDelay;
 }
 
-void GameManager::CurrentPiece::getCurrentPieceData(PieceType &pieceType, int &rotation) {
+void CurrentPiece::getCurrentPieceData(PieceType &pieceType, int &rotation) {
     pieceType = _pieceType;
     rotation = _rotation;
 }
 
-void GameManager::CurrentPiece::getNextPieceData(PieceType &pieceType, int &rotation) {
+void CurrentPiece::getNextPieceData(PieceType &pieceType, int &rotation) {
     pieceType = _nextPieceType;
     rotation = _nextPieceRotation;
 }
 
-bool GameManager::CurrentPiece::reset() {
+bool CurrentPiece::reset() {
     if (_isFirstPiece) {
         _nextPieceType = this->generateNextPiece();
         _pieceLockedEvent->invoke();
@@ -129,10 +148,11 @@ bool GameManager::CurrentPiece::reset() {
             }
 
             int thisRow = _yPos - 2 + row, thisColumn = _xPos - 2 + column;
-            if (GameManager::PlayField::getInstance()->getSquareType(thisRow, thisColumn)) {
+            if (PlayField::getInstance()->getSquareType(thisRow, thisColumn)) {
                 MainLoop::getInstance()->removeUpdateEventListener(_updateCallback);
-                CurrentPiece::_instance = nullptr;
                 _pieceLockedEvent->clearAllListeners();
+                _gameOverEvent->invoke();
+                //CurrentPiece::_instance = nullptr;
 
                 return false;
             }
@@ -151,7 +171,7 @@ bool GameManager::CurrentPiece::reset() {
     return true;
 }
 
-bool GameManager::CurrentPiece::rotateCounterClockwise() {
+bool CurrentPiece::rotateCounterClockwise() {
     if (!this->canRotateCounterClockwise() || _isAreActive) {
         return false;
     }
@@ -169,7 +189,7 @@ bool GameManager::CurrentPiece::rotateCounterClockwise() {
     return true;
 }
 
-bool GameManager::CurrentPiece::rotateClockwise() {
+bool CurrentPiece::rotateClockwise() {
     if (!this->canRotateClockwise() || _isAreActive) {
         return false;
     }
@@ -187,9 +207,11 @@ bool GameManager::CurrentPiece::rotateClockwise() {
     return true;
 }
 
-void GameManager::CurrentPiece::performFall() {
+void CurrentPiece::performFall() {
     if (!this->canMoveDown()) {
         this->passControlToAre();
+        //NES IMPLEMENTATION: a soft drop of 16 or above will restart from 10 (due to a bug), so it's 14, 15, 10, 11, 12 etc.
+        DataManager::RuntimeData::addSoftDropScore(_softDropCount > 16 ? _softDropCount - 6 : _softDropCount);
         _pieceLockedEvent->invoke();
         return;
     }
@@ -198,7 +220,7 @@ void GameManager::CurrentPiece::performFall() {
     this->redoLayout();
 }
 
-void GameManager::CurrentPiece::moveToLeft() {
+void CurrentPiece::moveToLeft() {
     if (!this->canMoveLeft() || _isAreActive) {
         return;
     }
@@ -207,7 +229,7 @@ void GameManager::CurrentPiece::moveToLeft() {
     this->redoLayout();
 }
 
-void GameManager::CurrentPiece::moveToRight() {
+void CurrentPiece::moveToRight() {
     if (!this->canMoveRight() || _isAreActive) {
         return;
     }
@@ -216,7 +238,7 @@ void GameManager::CurrentPiece::moveToRight() {
     this->redoLayout();
 }
 
-void GameManager::CurrentPiece::passControlToAre() {
+void CurrentPiece::passControlToAre() {
     int frames = 10;
     int positionOfPieceBottom = _yPos + (_endY - 2);
 
@@ -237,23 +259,31 @@ void GameManager::CurrentPiece::passControlToAre() {
         frames = 18;
     }
 
-    _areRemainingFrames = frames;
+    _areRemainingFrames += frames;
     _isAreActive = true;
 }
 
-void GameManager::CurrentPiece::addPieceLockedEventHandler(std::function<void()> callback) {
+void CurrentPiece::addPieceLockedEventHandler(std::function<void()> callback) {
     _pieceLockedEvent->addListener(callback);
 }
 
-bool GameManager::CurrentPiece::removePieceLockedEventHandler(std::function<void()> callback) {
+bool CurrentPiece::removePieceLockedEventHandler(std::function<void()> callback) {
     return _pieceLockedEvent->removeListener(callback);
 }
 
+void CurrentPiece::addGameOverEventHandler(std::function<void()> callback) {
+    _gameOverEvent->addListener(callback);
+}
 
-void GameManager::CurrentPiece::redoLayout() {
+bool CurrentPiece::removeGameOverEventHandler(std::function<void()> callback) {
+    return _gameOverEvent->removeListener(callback);
+}
+
+
+void CurrentPiece::redoLayout() {
     //clear the last blocks (repaint)
     for (int i = 0; i < 4; i++) {
-        GameManager::PlayField::getInstance()->setSquareType(_lastUsedIndices[i] / 10, _lastUsedIndices[i] % 10, 0);
+        PlayField::getInstance()->setSquareType(_lastUsedIndices[i] / 10, _lastUsedIndices[i] % 10, 0);
     }
 
     int piece = 0;
@@ -262,7 +292,7 @@ void GameManager::CurrentPiece::redoLayout() {
             if (_cachedLayout[row * 5 + column] != 0) {
                 //determine the global indices (from the play field), not the local ones from the layout
                 int thisRow = _yPos - 2 + row, thisColumn = _xPos - 2 + column;
-                GameManager::PlayField::getInstance()->setSquareType(thisRow, thisColumn, _cachedLayout[row * 5 + column]);
+                PlayField::getInstance()->setSquareType(thisRow, thisColumn, _cachedLayout[row * 5 + column]);
 
                 assert((piece < 4) && "More than 4 blocks found");
                 _lastUsedIndices[piece] = thisRow * 10 + thisColumn;
@@ -272,7 +302,7 @@ void GameManager::CurrentPiece::redoLayout() {
     }
 }
 
-bool GameManager::CurrentPiece::canMoveDown() {
+bool CurrentPiece::canMoveDown() {
     if (_yPos + (_endY - 2) + 1 >= 20) {
         return false;
     }
@@ -291,7 +321,7 @@ bool GameManager::CurrentPiece::canMoveDown() {
         }
 
         int thisRow = _yPos - 2 + lowestRow, thisColumn = _xPos - 2 + column;
-        if (GameManager::PlayField::getInstance()->getSquareType(thisRow + 1, thisColumn) != 0) {
+        if (PlayField::getInstance()->getSquareType(thisRow + 1, thisColumn) != 0) {
             return false;
         }
     }
@@ -299,7 +329,7 @@ bool GameManager::CurrentPiece::canMoveDown() {
     return true;
 }
 
-bool GameManager::CurrentPiece::canMoveLeft() {
+bool CurrentPiece::canMoveLeft() {
     //if the piece would exit the screen, return
     if (_xPos + (_startX - 2) - 1 < 0) {
         return false;
@@ -318,7 +348,7 @@ bool GameManager::CurrentPiece::canMoveLeft() {
         }
 
         int thisRow = _yPos - 2 + row, thisColumn = _xPos - 2 + leftMostColumn;
-        if (GameManager::PlayField::getInstance()->getSquareType(thisRow, thisColumn - 1) != 0) {
+        if (PlayField::getInstance()->getSquareType(thisRow, thisColumn - 1) != 0) {
             return false;
         }
     }
@@ -326,7 +356,7 @@ bool GameManager::CurrentPiece::canMoveLeft() {
     return true;
 }
 
-bool GameManager::CurrentPiece::canMoveRight() {
+bool CurrentPiece::canMoveRight() {
     //if the piece would exit the screen, return
     if (_xPos + (_endX - 2) + 1 >= 10) {
         return false;
@@ -345,7 +375,7 @@ bool GameManager::CurrentPiece::canMoveRight() {
         }
 
         int thisRow = _yPos - 2 + row, thisColumn = _xPos - 2 + rightMostColumn;
-        if (GameManager::PlayField::getInstance()->getSquareType(thisRow, thisColumn + 1) != 0) {
+        if (PlayField::getInstance()->getSquareType(thisRow, thisColumn + 1) != 0) {
             return false;
         }
     }
@@ -353,7 +383,7 @@ bool GameManager::CurrentPiece::canMoveRight() {
     return true;
 }
 
-bool GameManager::CurrentPiece::canRotateClockwise() {
+bool CurrentPiece::canRotateClockwise() {
     unsigned char *projectedLayout = DataManager::PieceData::getPieceLayout(_pieceType, _rotation + 1);
 
     for (int row = 0; row < 5; row++) {
@@ -368,7 +398,7 @@ bool GameManager::CurrentPiece::canRotateClockwise() {
             int thisRow = _yPos - 2 + row, thisColumn = _xPos - 2 + column;
             //if only one piece will occupy an already occupied block, then it's already impossible to rotate
             //if the piece would get outside the play field, you can not rotate
-            if (GameManager::PlayField::getInstance()->getSquareType(thisRow, thisColumn) != 0 ||
+            if (PlayField::getInstance()->getSquareType(thisRow, thisColumn) != 0 ||
                 (thisRow >= 20 || thisColumn < 0 || thisColumn >= 10)) {
                 delete[] projectedLayout;
                 return false;
@@ -380,7 +410,7 @@ bool GameManager::CurrentPiece::canRotateClockwise() {
     return true;
 }
 
-bool GameManager::CurrentPiece::canRotateCounterClockwise() {
+bool CurrentPiece::canRotateCounterClockwise() {
     unsigned char *projectedLayout = DataManager::PieceData::getPieceLayout(_pieceType, _rotation - 1);
 
     for (int row = 0; row < 5; row++) {
@@ -395,7 +425,7 @@ bool GameManager::CurrentPiece::canRotateCounterClockwise() {
             int thisRow = _yPos - 2 + row, thisColumn = _xPos - 2 + column;
             //if only one piece will occupy an already occupied block, then it's already impossible to rotate
             //if the piece would get outside the play field, you can not rotate
-            if (GameManager::PlayField::getInstance()->getSquareType(thisRow, thisColumn) != 0 ||
+            if (PlayField::getInstance()->getSquareType(thisRow, thisColumn) != 0 ||
                 (thisRow >= 20 || thisColumn < 0 || thisColumn >= 10)) {
                 delete[] projectedLayout;
                 return false;

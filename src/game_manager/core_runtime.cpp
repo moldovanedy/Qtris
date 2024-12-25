@@ -1,35 +1,41 @@
 #include "core_runtime.h"
 
-GameManager::CoreRuntime *GameManager::CoreRuntime::_instance = nullptr;
+using namespace GameManager;
 
-GameManager::CoreRuntime::CoreRuntime() {
+CoreRuntime *CoreRuntime::_instance = nullptr;
+
+CoreRuntime::CoreRuntime() {
     srand(time(NULL));
-    MainLoop::getInstance()->addUpdateEventListener(std::bind(&GameManager::CoreRuntime::onUpdate, this));
+    MainLoop::getInstance()->addUpdateEventListener(std::bind(&CoreRuntime::onUpdate, this));
 
-    GameManager::CurrentPiece::getInstance()->addPieceLockedEventHandler(
-        std::bind(&GameManager::CoreRuntime::checkForLineClears, this));
+    CurrentPiece::getInstance()->addPieceLockedEventHandler(
+        std::bind(&CoreRuntime::checkForLineClears, this));
 }
 
-GameManager::CoreRuntime *GameManager::CoreRuntime::getInstance() {
-    if (GameManager::CoreRuntime::_instance == nullptr) {
-        _instance = new GameManager::CoreRuntime();
+CoreRuntime::~CoreRuntime() {
+    _instance = nullptr;
+}
+
+CoreRuntime *CoreRuntime::getInstance() {
+    if (CoreRuntime::_instance == nullptr) {
+        _instance = new CoreRuntime();
     }
 
     return _instance;
 }
 
-void GameManager::CoreRuntime::onUpdate() {
+void CoreRuntime::onUpdate() {
     if (_lineClearAnimationStepsLeft > 0) {
         if ((MainLoop::getInstance()->getFrameCounter() % 4) != 0) {
             return;
         }
 
         for (int i = 0; i < 4; i++) {
-            GameManager::PlayField::getInstance()->setSquareType(
+            PlayField::getInstance()->setSquareType(
                 _rowsToClear[i],
                 _lineClearAnimationStepsLeft,
                 0);
-            GameManager::PlayField::getInstance()->setSquareType(
+            PlayField::getInstance()->setSquareType(
                 _rowsToClear[i],
                 10 - _lineClearAnimationStepsLeft,
                 0);
@@ -62,8 +68,8 @@ void GameManager::CoreRuntime::onUpdate() {
             }
 
             for (int column = 0; column < 10; column++) {
-                int squareType = GameManager::PlayField::getInstance()->getSquareType(row, column);
-                GameManager::PlayField::getInstance()->setSquareType(row + linesToGoDown, column, squareType);
+                int squareType = PlayField::getInstance()->getSquareType(row, column);
+                PlayField::getInstance()->setSquareType(row + linesToGoDown, column, squareType);
             }
         }
 
@@ -72,8 +78,8 @@ void GameManager::CoreRuntime::onUpdate() {
     }
 }
 
-void GameManager::CoreRuntime::checkForLineClears() {
-    GameManager::PlayField *field = GameManager::PlayField::getInstance();
+void CoreRuntime::checkForLineClears() {
+    PlayField *field = PlayField::getInstance();
     int linesCleared = 0;
     _rowsToClear[0] = 0;
     _rowsToClear[1] = 0;
@@ -99,7 +105,7 @@ void GameManager::CoreRuntime::checkForLineClears() {
     if (linesCleared > 0) {
         //NES IMPLEMENTATION: 5 animation steps that only run when the frame counter modulo 4 is 0, 
         //so the delay is between 17 and 20 frames
-        GameManager::CurrentPiece::getInstance()->setLineClearDelay(
+        CurrentPiece::getInstance()->setLineClearDelay(
             (MainLoop::getInstance()->getFrameCounter() % 4) + 17);
 
         _lineClearAnimationStepsLeft = 5;

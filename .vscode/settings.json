@@ -3,7 +3,9 @@
         "AUTOMOC",
         "AUTOUIC",
         "DCMAKE",
+        "Korobeiniki",
         "moldovanedy",
+        "Pixabay",
         "Qtris",
         "tetromino"
     ],
@@ -83,6 +85,8 @@
         "thread": "cpp",
         "typeinfo": "cpp",
         "variant": "cpp",
-        "qdebug": "cpp"
+        "qdebug": "cpp",
+        "qtableview": "cpp",
+        "qboxlayout": "cpp"
     }
 }

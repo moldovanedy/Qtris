@@ -69,6 +69,9 @@ StatisticsView::StatisticsView(QWidget *parent) : QWidget(parent)
         std::bind(&StatisticsView::onUpdate, this));
     RuntimeData::addDataChangedCallback(
         std::bind(&StatisticsView::redrawPieces, this));
+
+    //change the colors of the pieces (because we might start from a level different than 0)
+    this->redrawPieces();
 }
 
 StatisticsView::~StatisticsView() {}

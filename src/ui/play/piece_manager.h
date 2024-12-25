@@ -23,10 +23,7 @@ namespace UI::Play::Resources
     unsigned char getColorThreeFromPallette();
     unsigned char getColorFourFromPallette();
 
-    // void setColorOneFromPallette(unsigned char);
-    // void setColorTwoFromPallette(unsigned char);
-    // void setColorThreeFromPallette(unsigned char);
-    // void setColorFourFromPallette(unsigned char);
+    QColor getColorFromNesPalette(unsigned char index);
 
     /**
      * Sets the color of the pieces given the level number.
