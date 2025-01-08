@@ -28,6 +28,7 @@ namespace UI::Play
     private:
         void onPieceLocked();
         void onUpdate();
+        std::function<void()> _updateCallback;
         unsigned int _lastLevel = 0;
         bool _needsRepaint = false;
 

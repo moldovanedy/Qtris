@@ -19,7 +19,9 @@ namespace UI::Play
     private:
         void onPieceLocked();
         void onUpdate();
+        std::function<void()> _updateCallback;
         int _framesUntilRepaint = 0;
+
 
         QString _currentFile;
         QLabel *_pieceView;

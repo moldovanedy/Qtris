@@ -12,7 +12,6 @@
 
 #include "play/play_area.h"
 #include "menus/select_level.h"
-#include "menus/high_scores.h"
 
 #include "menu_bar.h"
 #include "../game_manager/main_loop.h"
@@ -25,8 +24,7 @@ namespace UI
         None = 0,
         StartScreen = 1,
         SelectLevel = 2,
-        PlayScreen = 3,
-        HighScores = 4
+        PlayScreen = 3
     };
 
     class MainWindow : public QMainWindow
@@ -46,7 +44,7 @@ namespace UI
         void setPauseScreenSize(int width, int height);
 
         Scene getCurrentScene();
-        void setCurrentScene(Scene scene);
+        void setCurrentScene(Scene scene, bool resetScene = false);
 
         QFont getAppFont();
 

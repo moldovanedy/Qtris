@@ -63,18 +63,19 @@ StatisticsView::StatisticsView(QWidget *parent) : QWidget(parent)
     }
 
 
-    CurrentPiece::getInstance()->addPieceLockedEventHandler(
-        std::bind(&StatisticsView::onPieceLocked, this));
-    MainLoop::getInstance()->addUpdateEventListener(
-        std::bind(&StatisticsView::onUpdate, this));
-    RuntimeData::addDataChangedCallback(
-        std::bind(&StatisticsView::redrawPieces, this));
+    _updateCallback = std::bind(&StatisticsView::onUpdate, this);
+
+    MainLoop::getInstance()->addUpdateEventListener(_updateCallback);
+    CurrentPiece::getInstance()->addPieceLockedEventListener(std::bind(&StatisticsView::onPieceLocked, this));
+    RuntimeData::addDataChangedCallback(std::bind(&StatisticsView::redrawPieces, this));
 
     //change the colors of the pieces (because we might start from a level different than 0)
     this->redrawPieces();
 }
 
-StatisticsView::~StatisticsView() {}
+StatisticsView::~StatisticsView() {
+    MainLoop::getInstance()->removeUpdateEventListener(_updateCallback);
+}
 
 void StatisticsView::redrawPieces() {
     if (RuntimeData::getLevel() == _lastLevel) {

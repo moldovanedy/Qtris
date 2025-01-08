@@ -31,13 +31,15 @@ NextPieceView::NextPieceView(QWidget *parent) : QWidget(parent)
     _pieceView->setContentsMargins(0, 0, 0, 0);
 
 
-    MainLoop::getInstance()->addUpdateEventListener(
-        std::bind(&NextPieceView::onUpdate, this));
-    CurrentPiece::getInstance()->addPieceLockedEventHandler(
+    _updateCallback = std::bind(&NextPieceView::onUpdate, this);
+    MainLoop::getInstance()->addUpdateEventListener(_updateCallback);
+    CurrentPiece::getInstance()->addPieceLockedEventListener(
         std::bind(&NextPieceView::onPieceLocked, this));
 }
 
-NextPieceView::~NextPieceView() {}
+NextPieceView::~NextPieceView() {
+    MainLoop::getInstance()->removeUpdateEventListener(_updateCallback);
+}
 
 void NextPieceView::onUpdate() {
     if (_framesUntilRepaint > 0) {

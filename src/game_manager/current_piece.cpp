@@ -25,6 +25,7 @@ DataManager::PieceData::PieceType CurrentPiece::generateNextPiece() {
 
 CurrentPiece::~CurrentPiece() {
     _instance = nullptr;
+    MainLoop::getInstance()->removeUpdateEventListener(_updateCallback);
 
     _pieceLockedEvent->clearAllListeners();
     delete _pieceLockedEvent;
@@ -152,7 +153,6 @@ bool CurrentPiece::reset() {
                 MainLoop::getInstance()->removeUpdateEventListener(_updateCallback);
                 _pieceLockedEvent->clearAllListeners();
                 _gameOverEvent->invoke();
-                //CurrentPiece::_instance = nullptr;
 
                 return false;
             }
@@ -263,20 +263,30 @@ void CurrentPiece::passControlToAre() {
     _isAreActive = true;
 }
 
-void CurrentPiece::addPieceLockedEventHandler(std::function<void()> callback) {
+void CurrentPiece::addPieceLockedEventListener(std::function<void()> callback) {
     _pieceLockedEvent->addListener(callback);
 }
 
-bool CurrentPiece::removePieceLockedEventHandler(std::function<void()> callback) {
+bool CurrentPiece::removePieceLockedEventListener(std::function<void()> callback) {
     return _pieceLockedEvent->removeListener(callback);
 }
 
-void CurrentPiece::addGameOverEventHandler(std::function<void()> callback) {
+void CurrentPiece::addGameOverEventListener(std::function<void()> callback) {
     _gameOverEvent->addListener(callback);
 }
 
-bool CurrentPiece::removeGameOverEventHandler(std::function<void()> callback) {
+bool CurrentPiece::removeGameOverEventListener(std::function<void()> callback) {
     return _gameOverEvent->removeListener(callback);
+}
+
+void CurrentPiece::stop() {
+    MainLoop::getInstance()->removeUpdateEventListener(_updateCallback);
+    _pieceLockedEvent->clearAllListeners();
+    _gameOverEvent->invoke();
+}
+
+void CurrentPiece::restart() {
+    MainLoop::getInstance()->addUpdateEventListener(_updateCallback);
 }
 
 

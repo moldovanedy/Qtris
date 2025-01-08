@@ -71,8 +71,8 @@ Scene MainWindow::getCurrentScene() {
     return _currentScene;
 }
 
-void MainWindow::setCurrentScene(Scene scene) {
-    if (_currentScene == scene) {
+void MainWindow::setCurrentScene(Scene scene, bool resetScene) {
+    if (!resetScene && _currentScene == scene) {
         return;
     }
 
@@ -82,13 +82,13 @@ void MainWindow::setCurrentScene(Scene scene) {
 
     switch (scene) {
     case Scene::PlayScreen:
+        GameManager::CurrentPiece::getInstance()->restart();
         _mainContent = Play::MainView::getInstance();
         break;
     case Scene::SelectLevel:
+        GameManager::CurrentPiece::getInstance()->stop();
         _mainContent = new Menus::SelectLevel(this);
         break;
-    case Scene::HighScores:
-        _mainContent = new Menus::HighScores(this);
     default:
         break;
     }

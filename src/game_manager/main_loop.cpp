@@ -7,12 +7,14 @@ MainLoop *MainLoop::_instance = nullptr;
 MainLoop::MainLoop(QWidget *parent) : QWidget(parent) {
     _updateEvent = new Utils::Event();
     _timer = new QTimer(this);
-    this->connect(_timer, &QTimer::timeout, this, QOverload<>::of(&MainLoop::invokeEvent));
+    _timerCallback = this->connect(_timer, &QTimer::timeout, this, QOverload<>::of(&MainLoop::invokeEvent));
     _timer->start(16);
 }
 
 MainLoop::~MainLoop() {
+    this->disconnect(_timerCallback);
     _instance = nullptr;
+    _updateEvent->clearAllListeners();
     delete _updateEvent;
     delete _timer;
 }

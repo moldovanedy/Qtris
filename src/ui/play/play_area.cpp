@@ -33,10 +33,17 @@ PlayArea::PlayArea(QWidget *parent) : QWidget(parent) {
     horizontalBox->addLayout(rightBarBox, 1);
     this->createRightBar(rightBarBox);
 
+    _updateCallback = std::bind(&PlayArea::onUpdate, this);
+
+    MainLoop::getInstance()->addUpdateEventListener(_updateCallback);
     RuntimeData::addDataChangedCallback(std::bind(&PlayArea::onDataChanged, this));
+    CurrentPiece::getInstance()->addGameOverEventListener(std::bind(&PlayArea::onGameOver, this));
 }
 
-PlayArea::~PlayArea() {}
+PlayArea::~PlayArea() {
+    MainLoop::getInstance()->removeUpdateEventListener(_updateCallback);
+    RuntimeData::terminate();
+}
 
 void PlayArea::onDataChanged() {
     this->setLevelNumber(RuntimeData::getLevel());
@@ -78,6 +85,10 @@ void PlayArea::keyPressEvent(QKeyEvent *e) {
 void PlayArea::keyReleaseEvent(QKeyEvent *e) {
     if (e->isAutoRepeat()) {
         return;
+    }
+
+    if (_isGameOver && _gameOverSceneRemainingFrames == 0) {
+        MainWindow::getInstance()->setCurrentScene(Scene::SelectLevel);
     }
 
     switch (e->key()) {
@@ -130,6 +141,20 @@ void PlayArea::setLevelNumber(int level) {
 
     levelString.insert(0, "LEVEL\n");
     _levelLabel->setText(levelString.c_str());
+}
+
+void PlayArea::onUpdate() {
+    if (!_isGameOver) {
+        return;
+    }
+
+    if (_gameOverSceneRemainingFrames > 0) {
+        _gameOverSceneRemainingFrames--;
+    }
+}
+
+void PlayArea::onGameOver() {
+    _isGameOver = true;
 }
 
 void PlayArea::createLeftBar(QBoxLayout *column) {

@@ -32,6 +32,7 @@ namespace GameManager {
 
         Utils::Event *_updateEvent;
         QTimer *_timer;
+        QMetaObject::Connection _timerCallback;
         int _frameCounter = 0;
         int _fastFrames = 0;
         void invokeEvent();

@@ -15,6 +15,7 @@ namespace GameManager {
         static CoreRuntime *_instance;
 
         void onUpdate();
+        std::function<void()> _updateCallback;
         void checkForLineClears();
 
         bool _isInLineClearAnimation = false;

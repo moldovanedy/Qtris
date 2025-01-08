@@ -9,6 +9,10 @@ namespace Utils {
 
     class Event {
     public:
+        ~Event() {
+            _callbacks.clear();
+        }
+
         void clearAllListeners() {
             _callbacks.clear();
         }

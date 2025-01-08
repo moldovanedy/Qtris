@@ -6,14 +6,16 @@ CoreRuntime *CoreRuntime::_instance = nullptr;
 
 CoreRuntime::CoreRuntime() {
     srand(time(NULL));
-    MainLoop::getInstance()->addUpdateEventListener(std::bind(&CoreRuntime::onUpdate, this));
+    _updateCallback = std::bind(&CoreRuntime::onUpdate, this);
+    MainLoop::getInstance()->addUpdateEventListener(_updateCallback);
 
-    CurrentPiece::getInstance()->addPieceLockedEventHandler(
+    CurrentPiece::getInstance()->addPieceLockedEventListener(
         std::bind(&CoreRuntime::checkForLineClears, this));
 }
 
 CoreRuntime::~CoreRuntime() {
     _instance = nullptr;
+    MainLoop::getInstance()->removeUpdateEventListener(_updateCallback);
 }
 
 CoreRuntime *CoreRuntime::getInstance() {

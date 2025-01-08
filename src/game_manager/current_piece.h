@@ -80,14 +80,17 @@ namespace GameManager {
         /**
          * Will call the given eventListener (callback) when the piece is locked into the existing pieces or floor.
          */
-        void addPieceLockedEventHandler(std::function<void()> callback);
-        bool removePieceLockedEventHandler(std::function<void()> callback);
+        void addPieceLockedEventListener(std::function<void()> callback);
+        bool removePieceLockedEventListener(std::function<void()> callback);
 
         /**
          * Will call the given eventListener (callback) when the it's game over.
          */
-        void addGameOverEventHandler(std::function<void()> callback);
-        bool removeGameOverEventHandler(std::function<void()> callback);
+        void addGameOverEventListener(std::function<void()> callback);
+        bool removeGameOverEventListener(std::function<void()> callback);
+
+        void stop();
+        void restart();
 
     private:
         CurrentPiece();

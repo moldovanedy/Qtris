@@ -39,6 +39,12 @@ namespace UI::Play
 
     private:
         void onDataChanged();
+        void onUpdate();
+        std::function<void()> _updateCallback;
+        void onGameOver();
+
+        bool _isGameOver = false;
+        unsigned int _gameOverSceneRemainingFrames = 16 + (4 * 20);
 
         void createLeftBar(QBoxLayout *columnBox);
         void createRightBar(QBoxLayout *columnBox);

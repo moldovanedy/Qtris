@@ -13,7 +13,6 @@ namespace UI {
         ~MenuBar();
 
         QAction *getGameNewAction();
-        QAction *getGameHighScoresAction();
         QAction *getGameQuitAction();
 
         QAction *getHelpAboutAction();
@@ -23,6 +22,12 @@ namespace UI {
         QMenu *getHelpMenu();
 
         QString _currentFile;
+
+    private slots:
+        void newGame();
+        void quitApp();
+
+        void showAboutPopup();
     };
 }
 #endif // MENU_BAR_H

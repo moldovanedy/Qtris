@@ -18,5 +18,6 @@ namespace DataManager::RuntimeData {
 
     void addDataChangedCallback(std::function<void()> callback);
     void removeDataChangedCallback(std::function<void()> callback);
+    void terminate();
 }
 #endif

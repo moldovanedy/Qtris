@@ -152,3 +152,8 @@ void DataManager::RuntimeData::addDataChangedCallback(std::function<void()> call
 void DataManager::RuntimeData::removeDataChangedCallback(std::function<void()> callback) {
     _dataChangedEvent->removeListener(callback);
 }
+
+void DataManager::RuntimeData::terminate() {
+    _dataChangedEvent->clearAllListeners();
+    delete _dataChangedEvent;
+}

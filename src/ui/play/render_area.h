@@ -32,6 +32,8 @@ namespace UI::Play
         unsigned char *_lastExpandedLayout;
         bool _isGameOver = false;
 
+        std::function<void()> _redrawCallback;
+
         void paintBlocks(QPainter *painter, QRect renderArea);
         void drawGameOverCurtain(QPainter *painter, QRect renderArea);
 

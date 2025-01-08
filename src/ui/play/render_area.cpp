@@ -8,8 +8,9 @@ RenderArea::RenderArea(QWidget *parent) : QWidget(parent) {
     //_lastExpandedLayout = new unsigned char[200] {0};
     this->setContentsMargins(0, 0, 0, 0);
 
-    MainLoop::getInstance()->addUpdateEventListener(std::bind(&RenderArea::redraw, this));
-    CurrentPiece::getInstance()->addGameOverEventHandler(std::bind(&RenderArea::onGameOver, this));
+    _redrawCallback = std::bind(&RenderArea::redraw, this);
+    MainLoop::getInstance()->addUpdateEventListener(_redrawCallback);
+    CurrentPiece::getInstance()->addGameOverEventListener(std::bind(&RenderArea::onGameOver, this));
     RuntimeData::addDataChangedCallback(std::bind(&RenderArea::checkForPieceColorChange, this));
 
     //change the colors of the pieces (because we might start from a level different than 0)
@@ -17,7 +18,7 @@ RenderArea::RenderArea(QWidget *parent) : QWidget(parent) {
 }
 
 RenderArea::~RenderArea() {
-    //delete[] _lastExpandedLayout;
+    MainLoop::getInstance()->removeUpdateEventListener(_redrawCallback);
 }
 
 void RenderArea::redraw() {
