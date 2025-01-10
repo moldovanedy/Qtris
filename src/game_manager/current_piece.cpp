@@ -10,6 +10,15 @@ CurrentPiece::CurrentPiece() {
     _gameOverEvent = new Utils::Event();
     _updateCallback = std::bind(&CurrentPiece::onUpdate, this);
     MainLoop::getInstance()->addUpdateEventListener(_updateCallback);
+
+    _sfxAudioOutput = new QAudioOutput();
+    _sfxAudioOutput->setVolume(1);
+
+    _pieceLockedSoundPlayer = new QMediaPlayer();
+    _pieceLockedSoundPlayer->setSource(QUrl("qrc:/assets/piece_locked.wav"));
+
+    _rotatePieceSoundPlayer = new QMediaPlayer();
+    _rotatePieceSoundPlayer->setSource(QUrl("qrc:/assets/rotate_piece.wav"));
 }
 
 DataManager::PieceData::PieceType CurrentPiece::generateNextPiece() {
@@ -31,6 +40,13 @@ CurrentPiece::~CurrentPiece() {
     delete _pieceLockedEvent;
     _gameOverEvent->clearAllListeners();
     delete _gameOverEvent;
+
+    delete _pieceLockedSoundPlayer;
+    _pieceLockedSoundPlayer = nullptr;
+    delete _rotatePieceSoundPlayer;
+    _rotatePieceSoundPlayer = nullptr;
+
+    delete _sfxAudioOutput;
 }
 
 CurrentPiece *CurrentPiece::getInstance() {
@@ -186,6 +202,9 @@ bool CurrentPiece::rotateCounterClockwise() {
     DataManager::PieceData::getLayoutBounds(_cachedLayout, _startX, _startY, _endX, _endY);
 
     this->redoLayout();
+    _rotatePieceSoundPlayer->stop();
+    _rotatePieceSoundPlayer->setAudioOutput(_sfxAudioOutput);
+    _rotatePieceSoundPlayer->play();
     return true;
 }
 
@@ -204,6 +223,9 @@ bool CurrentPiece::rotateClockwise() {
     DataManager::PieceData::getLayoutBounds(_cachedLayout, _startX, _startY, _endX, _endY);
 
     this->redoLayout();
+    _rotatePieceSoundPlayer->stop();
+    _rotatePieceSoundPlayer->setAudioOutput(_sfxAudioOutput);
+    _rotatePieceSoundPlayer->play();
     return true;
 }
 
@@ -213,6 +235,8 @@ void CurrentPiece::performFall() {
         //NES IMPLEMENTATION: a soft drop of 16 or above will restart from 10 (due to a bug), so it's 14, 15, 10, 11, 12 etc.
         DataManager::RuntimeData::addSoftDropScore(_softDropCount > 16 ? _softDropCount - 6 : _softDropCount);
         _pieceLockedEvent->invoke();
+        _pieceLockedSoundPlayer->setAudioOutput(_sfxAudioOutput);
+        _pieceLockedSoundPlayer->play();
         return;
     }
 

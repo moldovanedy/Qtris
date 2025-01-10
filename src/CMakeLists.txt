@@ -7,13 +7,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Multimedia)
 qt_standard_project_setup()
 
 qt_add_executable(Qtris 
     main.cpp
     ui/main_window.cpp
     ui/menu_bar.cpp
+    ui/about_window.cpp
 
     ui/play/main_view.cpp
     ui/play/play_area.cpp
@@ -45,7 +46,16 @@ qt_add_resources(
     PREFIX "/" 
     FILES ../assets/press_start_2P.ttf)
 
-target_link_libraries(Qtris PRIVATE Qt6::Widgets)
+qt_add_resources(
+    Qtris "audio" 
+    PREFIX "/" 
+    FILES 
+        ../assets/bg_song.mp3 
+        ../assets/game_over.ogg 
+        ../assets/piece_locked.wav 
+        ../assets/rotate_piece.wav)
+
+target_link_libraries(Qtris PRIVATE Qt6::Widgets Qt6::Multimedia)
 
 set_target_properties(Qtris PROPERTIES
     WIN32_EXECUTABLE ON

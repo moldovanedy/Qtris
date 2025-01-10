@@ -7,6 +7,8 @@
 #include <QLabel>
 #include <QSizePolicy>
 #include <QFontDatabase>
+#include <QMediaPlayer>
+#include <QAudioOutput>
 
 #include <string>
 
@@ -41,6 +43,7 @@ namespace UI::Play
         void onDataChanged();
         void onUpdate();
         std::function<void()> _updateCallback;
+        std::function<void()> _gameOverCallback;
         void onGameOver();
 
         bool _isGameOver = false;
@@ -53,6 +56,11 @@ namespace UI::Play
         QLabel *_scoreLabel;
         QLabel *_linesLabel;
         QLabel *_levelLabel;
+
+        QMediaPlayer *_mediaPlayer;
+        QMediaPlayer *_gameOverSoundPlayer;
+
+        QAudioOutput *_audioOutput;
 
         QString _currentFile;
     };

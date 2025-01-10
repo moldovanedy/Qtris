@@ -155,5 +155,9 @@ void DataManager::RuntimeData::removeDataChangedCallback(std::function<void()> c
 
 void DataManager::RuntimeData::terminate() {
     _dataChangedEvent->clearAllListeners();
-    delete _dataChangedEvent;
+    _level = 0;
+    _score = 0;
+    _clearedLines = 0;
+    _linesToNextLevel = 10;
+    _isLongLevel = false;
 }

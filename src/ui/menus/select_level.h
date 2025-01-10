@@ -19,6 +19,9 @@ namespace UI::Menus {
     protected:
         void keyPressEvent(QKeyEvent *e) override;
 
+    protected slots:
+        void selectLevelSlot(uint32_t selected);
+
     private:
         uint32_t _selectedLevel = 0;
         uint32_t _lastSelectedLevel = 0;

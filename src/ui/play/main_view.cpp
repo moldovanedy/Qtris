@@ -1,5 +1,8 @@
 #include "main_view.h"
 
+#include "../../game_manager/play_field.h"
+#include "../../game_manager/core_runtime.h"
+
 using namespace UI::Play;
 
 MainView *MainView::_instance = nullptr;
@@ -8,6 +11,10 @@ MainView::MainView(QWidget *parent) : QWidget(parent) {
     if (MainView::_instance == nullptr) {
         MainView::_instance = this;
     }
+
+    //initialization
+    GameManager::CoreRuntime::getInstance();
+    GameManager::CurrentPiece::getInstance();
 
     this->setStyleSheet("background-image: url();");
     QBoxLayout *verticalBoxContainer = new QBoxLayout(QBoxLayout::Direction::TopToBottom, this);
@@ -44,6 +51,9 @@ MainView::MainView(QWidget *parent) : QWidget(parent) {
 
 MainView::~MainView() {
     MainView::_instance = nullptr;
+    delete GameManager::PlayField::getInstance();
+    delete GameManager::CoreRuntime::getInstance();
+    delete GameManager::CurrentPiece::getInstance();
 }
 
 MainView *MainView::getInstance()

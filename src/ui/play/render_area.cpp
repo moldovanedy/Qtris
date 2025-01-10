@@ -100,9 +100,6 @@ void RenderArea::paintBlocks(QPainter *painter, QRect renderArea) {
     }
 }
 
-unsigned int _gameOverCurtainFrame = -16;
-unsigned int _gameOverCurtainRow = 0;
-
 void RenderArea::drawGameOverCurtain(QPainter *painter, QRect renderArea) {
     float rowHeight = renderArea.height() / 20;
 

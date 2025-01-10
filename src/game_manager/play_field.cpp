@@ -5,9 +5,9 @@ using namespace GameManager;
 PlayField *PlayField::_instance = nullptr;
 
 PlayField::PlayField() {
-    // for (int i = 0; i < 50; i++) {
-    //     _playField[i] = 0b01010101;
-    // }
+    for (int i = 0; i < 50; i++) {
+        _playField[i] = 0;
+    }
 }
 
 PlayField::~PlayField() {

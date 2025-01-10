@@ -4,11 +4,12 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/include/qt6/6.8.0/gcc_64/include/QtWidgets",
-                "/home/Edy/Qt/6.8.0/gcc_64/include/QtWidgets",
-                "/home/Edy/Qt/6.8.0/gcc_64/include",
-                "/home/Edy/Qt/6.8.0/gcc_64/include/QtCore",
-                "/home/Edy/Qt/6.8.0/gcc_64/include/QtGui",
+                "/usr/include/qt6/6.8.1/gcc_64/include/QtWidgets",
+                "/home/Edy/Qt/6.8.1/gcc_64/include/QtWidgets",
+                "/home/Edy/Qt/6.8.1/gcc_64/include",
+                "/home/Edy/Qt/6.8.1/gcc_64/include/QtCore",
+                "/home/Edy/Qt/6.8.1/gcc_64/include/QtGui",
+                "/home/Edy/Qt/6.8.1/gcc_64/include/QtMultimedia",
                 "${workspaceFolder}/src"
             ],
             "defines": [],

@@ -29,6 +29,7 @@ namespace UI::Play
         void onPieceLocked();
         void onUpdate();
         std::function<void()> _updateCallback;
+        std::function<void()> _redrawPiecesCallback;
         unsigned int _lastLevel = 0;
         bool _needsRepaint = false;
 

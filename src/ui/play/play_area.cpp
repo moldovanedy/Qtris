@@ -34,15 +34,38 @@ PlayArea::PlayArea(QWidget *parent) : QWidget(parent) {
     this->createRightBar(rightBarBox);
 
     _updateCallback = std::bind(&PlayArea::onUpdate, this);
+    _gameOverCallback = std::bind(&PlayArea::onGameOver, this);
 
     MainLoop::getInstance()->addUpdateEventListener(_updateCallback);
     RuntimeData::addDataChangedCallback(std::bind(&PlayArea::onDataChanged, this));
-    CurrentPiece::getInstance()->addGameOverEventListener(std::bind(&PlayArea::onGameOver, this));
+    CurrentPiece::getInstance()->addGameOverEventListener(_gameOverCallback);
+
+    _audioOutput = new QAudioOutput();
+    _audioOutput->setVolume(1);
+
+    _mediaPlayer = new QMediaPlayer();
+    _mediaPlayer->setSource(QUrl("qrc:/assets/bg_song.mp3"));
+    _mediaPlayer->setLoops(QMediaPlayer::Infinite);
+    _mediaPlayer->setAudioOutput(_audioOutput);
+
+    _gameOverSoundPlayer = new QMediaPlayer();
+    _gameOverSoundPlayer->setSource(QUrl("qrc:/assets/game_over.ogg"));
+
+    _mediaPlayer->play();
 }
 
 PlayArea::~PlayArea() {
     MainLoop::getInstance()->removeUpdateEventListener(_updateCallback);
+    CurrentPiece::getInstance()->removeGameOverEventListener(_gameOverCallback);
     RuntimeData::terminate();
+    _mediaPlayer->stop();
+
+    delete _mediaPlayer;
+    _mediaPlayer = nullptr;
+    delete _gameOverSoundPlayer;
+    _gameOverSoundPlayer = nullptr;
+
+    delete _audioOutput;
 }
 
 void PlayArea::onDataChanged() {
@@ -60,6 +83,18 @@ void PlayArea::keyPressEvent(QKeyEvent *e) {
     if (e->key() == Qt::Key::Key_Escape) {
         MainLoop::getInstance()->togglePause();
         MainWindow::getInstance()->setPauseScreenVisibility(MainLoop::getInstance()->isPaused());
+
+        this->setFocus();
+        if (MainLoop::getInstance()->isPaused()) {
+            _mediaPlayer->pause();
+        }
+        else {
+            _mediaPlayer->play();
+        }
+        return;
+    }
+
+    if (MainLoop::getInstance()->isPaused()) {
         return;
     }
 
@@ -84,6 +119,9 @@ void PlayArea::keyPressEvent(QKeyEvent *e) {
 
 void PlayArea::keyReleaseEvent(QKeyEvent *e) {
     if (e->isAutoRepeat()) {
+        return;
+    }
+    if (MainLoop::getInstance()->isPaused()) {
         return;
     }
 
@@ -155,6 +193,13 @@ void PlayArea::onUpdate() {
 
 void PlayArea::onGameOver() {
     _isGameOver = true;
+
+    if (_mediaPlayer != nullptr && _gameOverSoundPlayer != nullptr) {
+        _mediaPlayer->stop();
+
+        _gameOverSoundPlayer->setAudioOutput(_audioOutput);
+        _gameOverSoundPlayer->play();
+    }
 }
 
 void PlayArea::createLeftBar(QBoxLayout *column) {

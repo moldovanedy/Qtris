@@ -135,6 +135,11 @@ QBoxLayout *SelectLevel::getMainContent() {
         levelButton->setFont(MainWindow::getInstance()->getAppFont());
         levelButton->setCursor(Qt::PointingHandCursor);
 
+        this->connect(levelButton, &QPushButton::clicked, this, [=]() {
+            _selectedLevel = i;
+            this->selectLevel();
+            });
+
         levelGrid->addWidget(levelButton, i / 5, i % 5);
         _buttons[i] = levelButton;
     }
@@ -166,4 +171,9 @@ QBoxLayout *SelectLevel::getMainContent() {
     root->addWidget(xKeyExplanation);
 
     return root;
+}
+
+void SelectLevel::selectLevelSlot(uint32_t selected) {
+    _selectedLevel = selected;
+    this->selectLevel();
 }

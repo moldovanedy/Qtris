@@ -64,10 +64,11 @@ StatisticsView::StatisticsView(QWidget *parent) : QWidget(parent)
 
 
     _updateCallback = std::bind(&StatisticsView::onUpdate, this);
+    _redrawPiecesCallback = std::bind(&StatisticsView::redrawPieces, this);
 
     MainLoop::getInstance()->addUpdateEventListener(_updateCallback);
     CurrentPiece::getInstance()->addPieceLockedEventListener(std::bind(&StatisticsView::onPieceLocked, this));
-    RuntimeData::addDataChangedCallback(std::bind(&StatisticsView::redrawPieces, this));
+    RuntimeData::addDataChangedCallback(_redrawPiecesCallback);
 
     //change the colors of the pieces (because we might start from a level different than 0)
     this->redrawPieces();
@@ -75,6 +76,7 @@ StatisticsView::StatisticsView(QWidget *parent) : QWidget(parent)
 
 StatisticsView::~StatisticsView() {
     MainLoop::getInstance()->removeUpdateEventListener(_updateCallback);
+    RuntimeData::removeDataChangedCallback(_redrawPiecesCallback);
 }
 
 void StatisticsView::redrawPieces() {

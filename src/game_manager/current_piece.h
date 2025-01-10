@@ -1,6 +1,9 @@
 #ifndef CURRENT_PIECE_H
 #define CURRENT_PIECE_H
 
+#include <QMediaPlayer>
+#include <QAudioOutput>
+
 #include "../utils/event.h"
 #include "../data_manager/piece_data.h"
 #include "main_loop.h"
@@ -14,6 +17,7 @@ namespace GameManager {
     public:
         CurrentPiece(CurrentPiece &other) = delete;
         static CurrentPiece *getInstance();
+        ~CurrentPiece();
 
         void getCurrentPieceData(PieceType &pieceType, int &rotation);
         void getNextPieceData(PieceType &pieceType, int &rotation);
@@ -94,7 +98,6 @@ namespace GameManager {
 
     private:
         CurrentPiece();
-        ~CurrentPiece();
         static CurrentPiece *_instance;
 
         /**
@@ -162,6 +165,12 @@ namespace GameManager {
 
         bool _isRotateClockwiseKeyDown = false;
         bool _isRotateCounterClockwiseKeyDown = false;
+
+
+        QMediaPlayer *_pieceLockedSoundPlayer;
+        QMediaPlayer *_rotatePieceSoundPlayer;
+
+        QAudioOutput *_sfxAudioOutput;
     };
 }
 #endif

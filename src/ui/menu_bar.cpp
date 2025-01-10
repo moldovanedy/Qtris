@@ -1,6 +1,7 @@
 #include "menu_bar.h"
 #include "main_window.h"
 #include "../game_manager/current_piece.h"
+#include "about_window.h"
 
 using namespace UI;
 
@@ -62,4 +63,7 @@ void MenuBar::quitApp() {
     MainWindow::getInstance()->close();
 }
 
-void MenuBar::showAboutPopup() {}
+void MenuBar::showAboutPopup() {
+    AboutWindow *aboutWindowDialog = new AboutWindow();
+    aboutWindowDialog->showDialog();
+}
